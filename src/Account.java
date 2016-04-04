@@ -12,8 +12,9 @@ public class Account {
 
     /**
      * Initialize account with description and zero balance
+     *
      * @param description description of the account
-     * */
+     */
     public Account(String description) {
         this.description = description;
         this.balance = 0.0f;
@@ -22,9 +23,10 @@ public class Account {
 
     /**
      * Initialize account with description and start balance
+     *
      * @param description description of the account
-     * @param balance starting balance
-     * */
+     * @param balance     starting balance
+     */
     public Account(String description, float balance) {
         this(description);
         this.balance = balance;
@@ -32,14 +34,14 @@ public class Account {
 
     /**
      * @return balance of the account
-     * */
+     */
     public float getBalance() {
         return balance;
     }
 
     /**
      * @return description of the account
-     * */
+     */
     public String getDescription() {
         return description;
     }
@@ -47,8 +49,9 @@ public class Account {
     /**
      * Method to get all the records, returns new allocated Set
      * to prevent all sort of violations
+     *
      * @return Set of account's records (new allocated)
-     * */
+     */
     public Set<Record> getRecords() {
         return new LinkedHashSet<>(records);
     }

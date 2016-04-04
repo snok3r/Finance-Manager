@@ -10,25 +10,45 @@ public class Account {
     private Set<Record> records;
     private int hash;
 
+    /**
+     * Initialize account with description and zero balance
+     * @param description description of the account
+     * */
     public Account(String description) {
         this.description = description;
         this.balance = 0.0f;
         this.records = new LinkedHashSet<>();
     }
 
+    /**
+     * Initialize account with description and start balance
+     * @param description description of the account
+     * @param balance starting balance
+     * */
     public Account(String description, float balance) {
         this(description);
         this.balance = balance;
     }
 
+    /**
+     * @return balance of the account
+     * */
     public float getBalance() {
         return balance;
     }
 
+    /**
+     * @return String description of the account
+     * */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Method to get all the records, returns new allocated Set
+     * to prevent all sort of violations
+     * @return Set of records (new allocated)
+     * */
     public Set<Record> getRecords() {
         return new LinkedHashSet<>(records);
     }

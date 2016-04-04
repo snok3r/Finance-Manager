@@ -38,7 +38,7 @@ public class Account {
     }
 
     /**
-     * @return String description of the account
+     * @return description of the account
      * */
     public String getDescription() {
         return description;
@@ -47,7 +47,7 @@ public class Account {
     /**
      * Method to get all the records, returns new allocated Set
      * to prevent all sort of violations
-     * @return Set of records (new allocated)
+     * @return Set of account's records (new allocated)
      * */
     public Set<Record> getRecords() {
         return new LinkedHashSet<>(records);

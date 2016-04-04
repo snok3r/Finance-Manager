@@ -11,7 +11,7 @@ public class User {
     /**
      * Initialize user with login and password
      * @param login any set of characters
-     * @param password password, should be >= 5 and < 15 character long
+     * @param password password, must be >= 5 and < 15 character long
      */
     public User(String login, String password) {
         this.login = login;
@@ -22,7 +22,7 @@ public class User {
     /**
      * Method to change password
      * @param oldPassword old password
-     * @param newPassword new password, should be >= 5 and < 15 character long
+     * @param newPassword new password, must be >= 5 and < 15 character long
      * @throws IllegalArgumentException if passwords don't match or new password is < 5 or >= 15 character long
      * */
     public void changePassword(String oldPassword, String newPassword) {
@@ -45,7 +45,7 @@ public class User {
         if (password.length() >= 5 && password.length() < 15)
             this.password = saltingPassword(password);
         else
-            throw new IllegalArgumentException("password should be at least 5 character long (and less than 15 characters)");
+            throw new IllegalArgumentException("password must be at least 5 character long (and less than 15 characters)");
     }
 
 

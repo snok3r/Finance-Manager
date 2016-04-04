@@ -1,12 +1,17 @@
+import java.util.HashSet;
+import java.util.Set;
 
 public class User {
 
     private final String login;
     private String password;
+    private Set<Account> accounts;
+    private int hash;
 
     public User(String login, String password) {
         this.login = login;
         setPassword(password);
+        accounts = new HashSet<>();
     }
 
     public void changePassword(String oldPassword, String newPassword) {
@@ -50,6 +55,24 @@ public class User {
             pass[i] ^= salt[i];
 
         return new String(pass);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null) return false;
+        if (!(obj instanceof User)) return false;
+
+        User user = (User) obj;
+        return hashCode() == user.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        if (hash == 0)
+            hash = login.hashCode();
+
+        return hash;
     }
 
     public static void main(String[] args) {

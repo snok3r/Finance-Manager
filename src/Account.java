@@ -1,3 +1,5 @@
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -6,6 +8,7 @@ public class Account {
     private String description;
     private float balance;
     private Set<Record> records;
+    private int hash;
 
     public Account(String description) {
         this.description = description;
@@ -28,6 +31,16 @@ public class Account {
 
     public Set<Record> getRecords() {
         return new LinkedHashSet<>(records);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public int hashCode() {
+        throw new NotImplementedException();
     }
 
     public static void main(String[] args) {

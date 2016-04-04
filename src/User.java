@@ -8,30 +8,51 @@ public class User {
     private Set<Account> accounts;
     private int hash;
 
+    /**
+     * Initialize user with login and password
+     * @param login any set of characters
+     * @param password password, should be >= 5 and < 15 character long
+     */
     public User(String login, String password) {
         this.login = login;
         setPassword(password);
         accounts = new HashSet<>();
     }
 
+    /**
+     * Method to change password
+     * @param oldPassword old password
+     * @param newPassword new password, should be >= 5 and < 15 character long
+     * @throws IllegalArgumentException if passwords don't match or new password is < 5 or >= 15 character long
+     * */
     public void changePassword(String oldPassword, String newPassword) {
         if (!checkPassword(oldPassword))
-            throw new IllegalArgumentException("passwords don't match or new password is < 5 or >= 15 characters long");
+            throw new IllegalArgumentException("passwords don't match or new password is < 5 or >= 15 character long");
 
         try {
             setPassword(newPassword);
         } catch (IllegalArgumentException e) { // not letting client know, that oldPassword is right
-            throw new IllegalArgumentException("passwords don't match or new password is < 5 or >= 15 characters long");
+            throw new IllegalArgumentException("passwords don't match or new password is < 5 or >= 15 character long");
         }
     }
 
+    /**
+     * Private method to set password, accepts passwords >= 5 and < 15 character long
+     * @param password password to set
+     * @throws IllegalArgumentException if password is < 5 or >= 15 character long
+     * */
     private void setPassword(String password) {
         if (password.length() >= 5 && password.length() < 15)
             this.password = saltingPassword(password);
         else
-            throw new IllegalArgumentException("password should be at least 5 characters long (and less than 15 characters)");
+            throw new IllegalArgumentException("password should be at least 5 character long (and less than 15 characters)");
     }
 
+
+    /**
+     * Private method to check whether the given password it the password
+     * @param password password to check
+     * */
     private boolean checkPassword(String password) {
         if (password.length() != this.password.length())
             return false;
@@ -39,6 +60,11 @@ public class User {
         return this.password.equals(saltingPassword(password));
     }
 
+    /**
+     * Private method to salt the given password
+     * @param password password to salt
+     * @return String of salted password
+     * */
     private String saltingPassword(String password) {
         int len = password.getBytes().length;
 
@@ -67,11 +93,13 @@ public class User {
         return hashCode() == user.hashCode();
     }
 
+    /**
+     * Making hash with login String (User login must be uniq)
+     * */
     @Override
     public int hashCode() {
         if (hash == 0)
             hash = login.hashCode();
-
         return hash;
     }
 

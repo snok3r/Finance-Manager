@@ -27,7 +27,7 @@ public class Salt {
      * Checks if salted str2 equals to str1
      *
      * @param saltedStr already salted string
-     * @param str2 string to: first salt and then check
+     * @param str2      string to: first salt and then check
      */
     static public boolean isEquals(String saltedStr, String str2) {
         return saltedStr.equals(salt(str2));

@@ -1,4 +1,3 @@
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -56,19 +55,9 @@ public class Account {
         return new LinkedHashSet<>(records);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public int hashCode() {
-        throw new NotImplementedException();
-    }
-
     public static void main(String[] args) {
         Account account = new Account("Test account");
         Set<Record> records = account.getRecords();
-        records.add(new Record());
+        records.add(new Record(new java.sql.Date(new java.util.Date().getTime()), 1000, true, "test"));
     }
 }

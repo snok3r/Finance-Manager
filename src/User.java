@@ -2,6 +2,7 @@ import util.Salt;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 public class User {
 
@@ -81,8 +82,10 @@ public class User {
      */
     @Override
     public int hashCode() {
-        if (hash == 0)
-            hash = login.hashCode();
+        if (hash == 0) {
+            UUID key = UUID.nameUUIDFromBytes(login.getBytes());
+            hash = key.hashCode();
+        }
         return hash;
     }
 

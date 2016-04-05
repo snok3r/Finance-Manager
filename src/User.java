@@ -63,7 +63,7 @@ public class User {
         if (password.length() != this.password.length())
             return false;
 
-        return Salt.isSaltedStringEqualsToSecondString(this.password, password);
+        return Salt.isEquals(this.password, password);
     }
 
     @Override

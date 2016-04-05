@@ -1,4 +1,6 @@
-import util.Salt;
+package main;
+
+import main.util.Salt;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -78,7 +80,7 @@ public class User {
     }
 
     /**
-     * Making hash with login String (User login must be uniq)
+     * Making hash with login String (main.User login must be uniq)
      */
     @Override
     public int hashCode() {

@@ -1,4 +1,4 @@
-package util;
+package main.util;
 
 public class Salt {
     private static final byte[] salt = new byte[]{

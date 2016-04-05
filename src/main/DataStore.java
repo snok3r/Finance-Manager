@@ -1,3 +1,5 @@
+package main;
+
 import java.util.Set;
 
 public interface DataStore {
@@ -19,7 +21,7 @@ public interface DataStore {
 
     void addRecord(Account account, Record record);
 
-    // return removed User or null if no such user
+    // return removed main.User or null if no such user
     User removeUser(String name);
 
     // return null if no such account

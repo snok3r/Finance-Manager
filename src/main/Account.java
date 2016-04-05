@@ -10,7 +10,6 @@ public class Account {
     private String description;
     private float balance;
     private Set<Record> records;
-    private int hash;
 
     /**
      * Initialize account with description and zero balance
@@ -24,12 +23,12 @@ public class Account {
     }
 
     /**
-     * Initialize account with description and start balance
+     * Initialize account with start balance and description
      *
-     * @param description description of the account
      * @param balance     starting balance
+     * @param description description of the account
      */
-    public Account(String description, float balance) {
+    public Account(float balance, String description) {
         this(description);
         this.balance = balance;
     }

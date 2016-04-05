@@ -8,7 +8,7 @@ public class Salt {
             4, 2, 4};
 
     /**
-     * Adds salt to given str String
+     * Adds salt to <tt>str</tt>
      *
      * @param str string to salt
      * @return salted str
@@ -24,12 +24,12 @@ public class Salt {
     }
 
     /**
-     * Checks if salted str2 equals to str1
+     * Checks if <tt>saltedStr</tt> equals to salted <tt>str</tt>
      *
      * @param saltedStr already salted string
-     * @param str2      string to: first salt and then check
+     * @param str       string to: first salt and then check
      */
-    static public boolean isEquals(String saltedStr, String str2) {
-        return saltedStr.equals(salt(str2));
+    static public boolean isEquals(String saltedStr, String str) {
+        return saltedStr.equals(salt(str));
     }
 }

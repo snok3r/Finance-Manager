@@ -14,8 +14,8 @@ public class Record {
     private int hash;
 
     /**
-     * Initialize Record with java.sql.Date date, transaction amount,
-     * withdraw boolean and transaction description
+     * Initialize Record with date, transaction amount,
+     * transaction type and transaction description
      *
      * @param date        java.sql.Date of the record
      * @param amount      transaction amount

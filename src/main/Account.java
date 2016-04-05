@@ -1,5 +1,7 @@
 package main;
 
+import main.util.RecordType;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -59,6 +61,6 @@ public class Account {
     public static void main(String[] args) {
         Account account = new Account("Test account");
         Set<Record> records = account.getRecords();
-        records.add(new Record(new java.sql.Date(new java.util.Date().getTime()), 1000, true, "test"));
+        records.add(new Record(new java.sql.Date(new java.util.Date().getTime()), 1000, RecordType.WITHDRAW, "test"));
     }
 }

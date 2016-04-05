@@ -2,7 +2,6 @@ package main;
 
 import main.util.RecordType;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -62,18 +61,19 @@ public class Account {
     public Record removeRecord(Record record) {
         Record toRet = null;
 
-        for (Iterator<Record> it = records.iterator(); it.hasNext(); ) {
-            Record r = it.next();
-            if (r.equals(record)) {
-                toRet = r;
+        if (records.contains(record)) {
+            for (Record rec : records) {
+                if (rec.equals(record)) {
+                    toRet = rec;
 
-                if (r.getType() == RecordType.WITHDRAW)
-                    balance += record.getAmount();
-                else if (r.getType() == RecordType.DEPOSIT)
-                    balance -= record.getAmount();
+                    if (rec.getType() == RecordType.WITHDRAW)
+                        balance += rec.getAmount();
+                    else if (rec.getType() == RecordType.DEPOSIT)
+                        balance -= rec.getAmount();
 
-                records.remove(r);
-                break;
+                    records.remove(rec);
+                    break;
+                }
             }
         }
 
@@ -95,12 +95,16 @@ public class Account {
     }
 
     /**
-     * Method to get all the records, returns new allocated Set
-     * to prevent all sort of violations
+     * Method to get all the records
      *
-     * @return Set of account's records (new allocated)
+     * @return Set of account's records
      */
     public Set<Record> getRecords() {
+        /* 
+        returns newly allocated Set
+        to prevent sort of violations,
+        like adding something to the returned value 
+        */
         return new LinkedHashSet<>(records);
     }
 

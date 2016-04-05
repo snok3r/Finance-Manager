@@ -3,7 +3,6 @@ package main;
 import main.util.Salt;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
@@ -87,12 +86,13 @@ public class User {
     public Account removeAccount(Account account) {
         Account toRet = null;
 
-        for (Iterator<Account> it = accounts.iterator(); it.hasNext(); ) {
-            Account a = it.next();
-            if (a.equals(account)) {
-                toRet = a;
-                accounts.remove(a);
-                break;
+        if (accounts.contains(account)) {
+            for (Account acc : accounts) {
+                if (acc.equals(account)) {
+                    toRet = acc;
+                    accounts.remove(acc);
+                    break;
+                }
             }
         }
 
@@ -109,11 +109,6 @@ public class User {
         return hashCode() == user.hashCode();
     }
 
-    @Override
-    public String toString() {
-        return login;
-    }
-
     /**
      * Making hash with login String (main.User login must be uniq)
      */
@@ -124,6 +119,11 @@ public class User {
             hash = key.hashCode();
         }
         return hash;
+    }
+
+    @Override
+    public String toString() {
+        return login;
     }
 
     public static void main(String[] args) {

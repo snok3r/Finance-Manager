@@ -77,10 +77,17 @@ public class Record {
         return hash;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s %.2f %s", new java.util.Date(date.getTime()), amount, type);
+    }
+
     public static void main(String[] args) {
         Record r1 = new Record(new Date(new java.util.Date().getTime()), 1000, RecordType.WITHDRAW, "test");
-        Record r2 = new Record(new Date(new java.util.Date().getTime() - 1), 1000, RecordType.WITHDRAW, "test");
+        Record r2 = new Record(new Date(new java.util.Date().getTime() - 1), 2000, RecordType.WITHDRAW, "test");
 
+        System.out.println(r1);
+        System.out.println(r2);
         System.out.println(r1.equals(r2)); // false
     }
 }

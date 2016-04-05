@@ -3,6 +3,7 @@ package main;
 import main.util.Salt;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
@@ -56,7 +57,6 @@ public class User {
             throw new IllegalArgumentException("password must be at least 5 character long (and less than 15 characters)");
     }
 
-
     /**
      * Private method to check whether given password is THE password
      *
@@ -69,6 +69,36 @@ public class User {
         return Salt.isEquals(this.password, password);
     }
 
+    /**
+     * Adds <tt>account</tt> to Set of accounts,
+     *
+     * @param account account to add
+     */
+    public void addAccount(Account account) {
+        accounts.add(account);
+    }
+
+    /**
+     * Deletes <tt>account</tt> from Set of accounts
+     *
+     * @param account to delete
+     * @return deleted <tt>account</tt> (or null if not found)
+     */
+    public Account removeAccount(Account account) {
+        Account toRet = null;
+
+        for (Iterator<Account> it = accounts.iterator(); it.hasNext(); ) {
+            Account a = it.next();
+            if (a.equals(account)) {
+                toRet = a;
+                accounts.remove(a);
+                break;
+            }
+        }
+
+        return toRet;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
@@ -77,6 +107,11 @@ public class User {
 
         User user = (User) obj;
         return hashCode() == user.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return login;
     }
 
     /**

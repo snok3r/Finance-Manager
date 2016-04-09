@@ -106,11 +106,11 @@ public class User {
         if (!(obj instanceof User)) return false;
 
         User user = (User) obj;
-        return hashCode() == user.hashCode();
+        return login.equals(user.login);
     }
 
     /**
-     * Making hash with login String (main.User login must be uniq)
+     * Making hash with <tt>login</tt> String
      */
     @Override
     public int hashCode() {

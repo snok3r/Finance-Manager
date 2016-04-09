@@ -64,7 +64,11 @@ public class Record {
         if (!(obj instanceof Record)) return false;
 
         Record record = (Record) obj;
-        return this.hashCode() == record.hashCode();
+        boolean res = date.equals(record.date) &&
+                amount == record.amount &&
+                type == record.type &&
+                description.equals(record.description);
+        return res;
     }
 
     @Override

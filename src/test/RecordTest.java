@@ -10,12 +10,13 @@ import static org.junit.Assert.*;
 public class RecordTest {
     private Record recordDif1, recordDif2, recordEq1, recordEq2;
     private Date date;
+    private float[] amounts = new float[]{1000, 2000, 5000, 10000};
     private float amountDif1, amountDif2, amountEq;
 
     @Before
     public void setUp() throws Exception {
-        amountDif1 = 1000;
-        amountDif2 = 2000;
+        amountDif1 = new java.util.Random().nextInt(amounts.length);
+        amountDif2 = new java.util.Random().nextInt(amounts.length);
 
         amountEq = 3000;
 
@@ -37,11 +38,6 @@ public class RecordTest {
 
     @Test
     public void equals() throws Exception {
-        assertNotNull(recordDif1);
-        assertNotNull(recordDif2);
-        assertNotNull(recordEq1);
-        assertNotNull(recordEq2);
-
         assertEquals(recordEq1, recordEq2);
         assertEquals(recordEq2, recordEq1);
         

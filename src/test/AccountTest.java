@@ -26,13 +26,6 @@ public class AccountTest {
     }
 
     @Test
-    public void checkNotNull() throws Exception {
-        assertNotNull(account);
-        assertNotNull(recordD);
-        assertNotNull(recordW);
-    }
-
-    @Test
     public void addRecord() throws Exception {
         float balanceAfterDeposit = account.getBalance() + depositAmount;
         float balanceAfterWithdraw = balanceAfterDeposit - withdrawAmount;

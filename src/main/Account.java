@@ -42,7 +42,7 @@ public class Account {
      * @param record record to add
      */
     public void addRecord(Record record) {
-        // if record has been added, than changing balance
+        // if record has been added, then changing balance
         if (records.add(record)) {
             if (record.getType() == RecordType.WITHDRAW)
                 balance -= record.getAmount();

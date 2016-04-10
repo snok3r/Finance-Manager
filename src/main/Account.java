@@ -108,6 +108,15 @@ public class Account {
         return new LinkedHashSet<>(records);
     }
 
+    /**
+     * Method to get number of records
+     *
+     * @return number of records in the account
+     */
+    public int getNumOfRecords() {
+        return records.size();
+    }
+
     @Override
     public String toString() {
         return String.format("%s. Balance: %.2f", description, balance);

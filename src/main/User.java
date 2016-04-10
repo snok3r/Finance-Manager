@@ -99,6 +99,27 @@ public class User {
         return toRet;
     }
 
+    /**
+     * Method to get number of accounts
+     *
+     * @return number of accounts user has
+     */
+    public int getNumOfAccounts() {
+        return accounts.size();
+    }
+
+    /**
+     * Mathod to get the balance of all user's accounts
+     *
+     * @return user balance (cumulative balance of all accounts)
+     */
+    public float getUserBalance() {
+        float balance = 0;
+        for (Account account : accounts)
+            balance += account.getBalance();
+        return balance;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;

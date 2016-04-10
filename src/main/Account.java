@@ -42,11 +42,13 @@ public class Account {
      * @param record record to add
      */
     public void addRecord(Record record) {
-        records.add(record);
-        if (record.getType() == RecordType.WITHDRAW)
-            balance -= record.getAmount();
-        else if (record.getType() == RecordType.DEPOSIT)
-            balance += record.getAmount();
+        // if record has been added, than changing balance
+        if (records.add(record)) {
+            if (record.getType() == RecordType.WITHDRAW)
+                balance -= record.getAmount();
+            else if (record.getType() == RecordType.DEPOSIT)
+                balance += record.getAmount();
+        }
     }
 
     /**
@@ -100,10 +102,10 @@ public class Account {
      * @return Set of account's records
      */
     public Set<Record> getRecords() {
-        /* 
+        /*
         returns newly allocated Set
         to prevent sort of violations,
-        like adding something to the returned value 
+        like adding something to the returned value
         */
         return new LinkedHashSet<>(records);
     }

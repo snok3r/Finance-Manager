@@ -10,7 +10,7 @@ public class User {
 
     private final String login;
     private String password;
-    private Set<Account> accounts;
+    private final Set<Account> accounts;
     private int hash;
 
     /**
@@ -74,7 +74,9 @@ public class User {
      * @param account account to add
      */
     public void addAccount(Account account) {
-        accounts.add(account);
+        synchronized (accounts) {
+            accounts.add(account);
+        }
     }
 
     /**
@@ -86,12 +88,14 @@ public class User {
     public Account removeAccount(Account account) {
         Account toRet = null;
 
-        if (accounts.contains(account)) {
-            for (Account acc : accounts) {
-                if (acc.equals(account)) {
-                    toRet = acc;
-                    accounts.remove(acc);
-                    break;
+        synchronized (accounts) {
+            if (accounts.contains(account)) {
+                for (Account acc : accounts) {
+                    if (acc.equals(account)) {
+                        toRet = acc;
+                        accounts.remove(acc);
+                        break;
+                    }
                 }
             }
         }
@@ -109,14 +113,16 @@ public class User {
     }
 
     /**
-     * Mathod to get the balance of all user's accounts
+     * Method to get the balance of all user's accounts
      *
      * @return user balance (cumulative balance of all accounts)
      */
     public float getUserBalance() {
         float balance = 0;
-        for (Account account : accounts)
-            balance += account.getBalance();
+        synchronized (accounts) {
+            for (Account account : accounts)
+                balance += account.getBalance();
+        }
         return balance;
     }
 

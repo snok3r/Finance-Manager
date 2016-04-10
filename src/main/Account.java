@@ -9,7 +9,7 @@ public class Account {
 
     private String description;
     private float balance;
-    private Set<Record> records;
+    private final Set<Record> records;
 
     /**
      * Initialize account with description and zero balance
@@ -42,12 +42,14 @@ public class Account {
      * @param record record to add
      */
     public void addRecord(Record record) {
-        // if record has been added, then changing balance
-        if (records.add(record)) {
-            if (record.getType() == RecordType.WITHDRAW)
-                balance -= record.getAmount();
-            else if (record.getType() == RecordType.DEPOSIT)
-                balance += record.getAmount();
+        synchronized (records) {
+            if (records.add(record)) {
+                // if record has been added, then changing balance
+                if (record.getType() == RecordType.WITHDRAW)
+                    balance -= record.getAmount();
+                else if (record.getType() == RecordType.DEPOSIT)
+                    balance += record.getAmount();
+            }
         }
     }
 
@@ -63,18 +65,20 @@ public class Account {
     public Record removeRecord(Record record) {
         Record toRet = null;
 
-        if (records.contains(record)) {
-            for (Record rec : records) {
-                if (rec.equals(record)) {
-                    toRet = rec;
+        synchronized (records) {
+            if (records.contains(record)) {
+                for (Record rec : records) {
+                    if (rec.equals(record)) {
+                        toRet = rec;
 
-                    if (rec.getType() == RecordType.WITHDRAW)
-                        balance += rec.getAmount();
-                    else if (rec.getType() == RecordType.DEPOSIT)
-                        balance -= rec.getAmount();
+                        if (rec.getType() == RecordType.WITHDRAW)
+                            balance += rec.getAmount();
+                        else if (rec.getType() == RecordType.DEPOSIT)
+                            balance -= rec.getAmount();
 
-                    records.remove(rec);
-                    break;
+                        records.remove(rec);
+                        break;
+                    }
                 }
             }
         }

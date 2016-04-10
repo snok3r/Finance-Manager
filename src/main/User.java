@@ -125,16 +125,4 @@ public class User {
     public String toString() {
         return login;
     }
-
-    public static void main(String[] args) {
-        User user = new User("kos", "kostya");
-
-        System.out.println(user.checkPassword("kostya"));
-        System.out.println(user.checkPassword(Salt.salt(user.password)));
-        System.out.println(user.checkPassword("koasas"));
-        System.out.println(user.checkPassword("kos"));
-
-        user.changePassword("kostya", "kostya123");
-        System.out.println(Salt.salt(user.password));
-    }
 }

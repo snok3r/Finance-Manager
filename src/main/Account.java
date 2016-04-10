@@ -112,13 +112,4 @@ public class Account {
     public String toString() {
         return String.format("%s. Balance: %.2f", description, balance);
     }
-
-    public static void main(String[] args) {
-        Account account = new Account("Test account");
-        Record record = new Record(new java.sql.Date(new java.util.Date().getTime()), 1000, RecordType.WITHDRAW, "test");
-        account.addRecord(record);
-        System.out.println(account);
-        account.removeRecord(record);
-        System.out.println(account);
-    }
 }

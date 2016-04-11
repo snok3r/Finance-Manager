@@ -57,14 +57,11 @@ public class User implements Serializable {
     }
 
     /**
-     * Private method to check whether given password is THE password
+     * Method to check whether given password is THE password
      *
      * @param password password to check
      */
-    private boolean checkPassword(String password) {
-        if (password.length() != this.password.length())
-            return false;
-
+    public boolean checkPassword(String password) {
         return MD5.isEquals(this.password, password);
     }
 

@@ -1,6 +1,6 @@
 package main;
 
-import main.util.Salt;
+import main.util.MD5;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -52,7 +52,7 @@ public class User implements Serializable {
      */
     private void setPassword(String password) {
         if (password.length() >= 5 && password.length() < 15)
-            this.password = Salt.salt(password);
+            this.password = MD5.getHash(password);
         else
             throw new IllegalArgumentException("password must be at least 5 character long (and less than 15 characters)");
     }
@@ -66,7 +66,7 @@ public class User implements Serializable {
         if (password.length() != this.password.length())
             return false;
 
-        return Salt.isEquals(this.password, password);
+        return MD5.isEquals(this.password, password);
     }
 
     /**

@@ -5,7 +5,6 @@ import main.util.MD5;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 public class User implements Serializable {
 
@@ -142,10 +141,8 @@ public class User implements Serializable {
      */
     @Override
     public int hashCode() {
-        if (hash == 0) {
-            UUID key = UUID.nameUUIDFromBytes(login.getBytes());
-            hash = key.hashCode();
-        }
+        if (hash == 0)
+            hash = MD5.getHash(login).hashCode();
         return hash;
     }
 

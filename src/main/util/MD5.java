@@ -20,7 +20,6 @@ public class MD5 {
             md5.reset();
             md5.update(str.getBytes());
 
-
             byte messageDigest[] = md5.digest();
 
             for (int i = 0; i < messageDigest.length; i++) {

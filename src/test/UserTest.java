@@ -27,19 +27,25 @@ public class UserTest {
         // trying change password with wrong old password
         try {
             user.changePassword("kosya", "fa-da*f2");
+            System.out.println("Trying change password with wrong old password: FAIL (exception not caught)");
         } catch (IllegalArgumentException e) {
+            System.out.println("Trying change password with wrong old password: OK (exception caught)");
         }
 
         // trying change password with wrong new password length (<= 5)
         try {
             user.changePassword("kostya", "f");
+            System.out.println("Trying change password with wrong new password length (<= 5): FAIL (exception not caught)");
         } catch (IllegalArgumentException e) {
+            System.out.println("Trying change password with wrong new password length (<= 5): OK (exception caught)");
         }
 
         // trying change password with wrong new password length (> 15)
         try {
             user.changePassword("kostya", "fa-da*f2dasdhg2j3gjhgsfjhsa");
+            System.out.println("Trying change password with wrong new password length (> 15): FAIL (exception not caught)");
         } catch (IllegalArgumentException e) {
+            System.out.println("Trying change password with wrong new password length (> 15): OK (exception caught)");
         }
     }
 

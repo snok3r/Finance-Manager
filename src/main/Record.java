@@ -1,10 +1,10 @@
 package main;
 
+import main.util.MD5;
 import main.util.RecordType;
 
 import java.io.Serializable;
 import java.sql.Date;
-import java.util.UUID;
 
 public class Record implements Serializable {
 
@@ -75,9 +75,8 @@ public class Record implements Serializable {
     @Override
     public int hashCode() {
         if (hash == 0) {
-            String uuid = String.format("%d%f%s%s", date.getTime(), amount, type.ordinal(), description);
-            UUID key = UUID.nameUUIDFromBytes(uuid.getBytes());
-            hash = key.hashCode();
+            String str = String.format("%d%f%s%s", date.getTime(), amount, type.ordinal(), description);
+            hash = MD5.getHash(str).hashCode();
         }
         return hash;
     }

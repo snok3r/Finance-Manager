@@ -2,10 +2,11 @@ package main;
 
 import main.util.RecordType;
 
+import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class Account {
+public class Account implements Serializable {
 
     private String description;
     private float balance;

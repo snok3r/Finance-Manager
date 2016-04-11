@@ -2,11 +2,12 @@ package main;
 
 import main.util.Salt;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class User {
+public class User implements Serializable {
 
     private final String login;
     private String password;

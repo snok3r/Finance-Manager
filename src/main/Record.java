@@ -2,10 +2,11 @@ package main;
 
 import main.util.RecordType;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.UUID;
 
-public class Record {
+public class Record implements Serializable {
 
     private final Date date;
     private float amount;
@@ -83,6 +84,6 @@ public class Record {
 
     @Override
     public String toString() {
-        return String.format("%s %.2f %s", new java.util.Date(date.getTime()), amount, type);
+        return String.format("%s. %s %.2f %s", description, new java.util.Date(date.getTime()), amount, type);
     }
 }

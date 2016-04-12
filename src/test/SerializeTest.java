@@ -17,6 +17,7 @@ public class SerializeTest {
     private List<User> usersToSerialize;
     private List<User> usersToDeserialize;
     private final String fileName = "test.dat";
+    private final Serialize<User> serializator = new Serialize<>();
 
     @Before
     public void setUp() throws Exception {
@@ -57,8 +58,8 @@ public class SerializeTest {
 
     @Test
     public void testEquals() throws Exception {
-        Serialize.serializeUsers(fileName, usersToSerialize);
-        Serialize.deserializeUsers(fileName, usersToDeserialize, true);
+        serializator.serialize(fileName, usersToSerialize);
+        serializator.deserialize(fileName, usersToDeserialize, true);
 
         assertEquals(usersToSerialize, usersToDeserialize);
         assertEquals(usersToDeserialize, usersToSerialize);

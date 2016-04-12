@@ -1,21 +1,18 @@
 package main.util;
 
-import main.User;
-
 import java.io.*;
 import java.util.Collection;
-import java.util.List;
 
-public class Serialize {
+public class Serialize<T extends Serializable> {
 
     /**
-     * Serializes Collection of <tt>users</tt>
+     * Serializes Collection <tt>collection</tt>
      * to File named <tt>fileName</tt>.
      *
-     * @param fileName name of file where to save it
-     * @param users    Collection to serialize
+     * @param fileName   name of file where to save it
+     * @param collection Collection to serialize
      */
-    public static void serializeUsers(String fileName, Collection<? extends User> users) {
+    public void serialize(String fileName, Collection<? extends T> collection) {
         FileOutputStream fo = null;
         ObjectOutputStream output = null;
         try {
@@ -23,8 +20,8 @@ public class Serialize {
             fo = new FileOutputStream(file);
             output = new ObjectOutputStream(fo);
 
-            for (Object u : users)
-                output.writeObject((User) u);
+            for (T item : collection)
+                output.writeObject(item);
 
         } catch (FileNotFoundException e) {
             System.out.printf("File %s not found", fileName);
@@ -36,16 +33,16 @@ public class Serialize {
     }
 
     /**
-     * Deserializes <tt>users</tt> from File <tt>fileName</tt>,
+     * Deserializes <tt>collection</tt> from File <tt>fileName</tt>,
      * and you may delete the file after it's done passing true
      * for <tt>delete</tt> boolean. If something went wrong
      * and File <tt>fileName</tt> hasn't been read, then it doesn't get deleted.
      *
-     * @param fileName name of File from which you want to deserialize
-     * @param users    Collection of users to save deserialized data to
-     * @param delete   whether the <tt>fileName</tt> will be deleted or not
+     * @param fileName   name of File from which you want to deserialize
+     * @param collection Collection to save deserialized data to
+     * @param delete     whether the <tt>fileName</tt> will be deleted or not
      */
-    public static void deserializeUsers(String fileName, Collection<? super User> users, boolean delete) {
+    public void deserialize(String fileName, Collection<? super T> collection, boolean delete) {
         boolean done = false;
 
         File file = null;
@@ -58,8 +55,8 @@ public class Serialize {
 
             try {
                 while (true) {
-                    User user = (User) input.readObject();
-                    users.add(user);
+                    T item = (T) input.readObject();
+                    collection.add(item);
                 }
             } catch (EOFException e) {
                 done = true;
@@ -78,13 +75,13 @@ public class Serialize {
     }
 
     /**
-     * Deserializes <tt>users</tt> from File <tt>fileName</tt>
+     * Deserializes <tt>collection</tt> from File <tt>fileName</tt>
      *
-     * @param fileName name of File from which you're deserializing
-     * @param users    Collection of users to save deserialized data to
+     * @param fileName   name of File from which you're deserializing
+     * @param collection Collection to save the deserialized data to
      */
-    public static void deserializeUsers(String fileName, List<? super User> users) {
-        deserializeUsers(fileName, users, false);
+    public void deserialize(String fileName, Collection<? super T> collection) {
+        deserialize(fileName, collection, false);
     }
 
     /**

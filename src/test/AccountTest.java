@@ -21,8 +21,8 @@ public class AccountTest {
         depositAmount = amounts[new java.util.Random().nextInt(amounts.length)];
         withdrawAmount = amounts[new java.util.Random().nextInt(amounts.length)];
 
-        recordD = new Record(new java.sql.Date(new java.util.Date().getTime()), depositAmount, RecordType.DEPOSIT, "deposit 2000");
-        recordW = new Record(new java.sql.Date(new java.util.Date().getTime()), withdrawAmount, RecordType.WITHDRAW, "Withdraw 1000");
+        recordD = new Record(new java.util.Date().getTime(), depositAmount, RecordType.DEPOSIT, "deposit 2000");
+        recordW = new Record(new java.util.Date().getTime(), withdrawAmount, RecordType.WITHDRAW, "Withdraw 1000");
     }
 
     @Test

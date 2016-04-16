@@ -1,5 +1,5 @@
-import main.Account;
-import main.User;
+import main.java.Account;
+import main.java.User;
 import org.junit.Before;
 import org.junit.Test;
 

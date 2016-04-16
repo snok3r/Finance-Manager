@@ -1,6 +1,6 @@
 package main.util;
 
-import main.Record;
+import main.java.Record;
 
 import java.util.Comparator;
 

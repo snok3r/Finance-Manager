@@ -2,9 +2,9 @@ package main.database;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-import main.Account;
-import main.Record;
-import main.User;
+import main.java.Account;
+import main.java.Record;
+import main.java.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

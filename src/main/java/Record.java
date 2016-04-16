@@ -1,4 +1,4 @@
-package main;
+package main.java;
 
 import main.util.MD5;
 import main.util.RecordType;

@@ -1,4 +1,4 @@
-import main.Record;
+import main.java.Record;
 import main.util.RecordType;
 import org.junit.Before;
 import org.junit.Test;

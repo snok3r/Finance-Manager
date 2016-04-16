@@ -1,5 +1,5 @@
-import main.Account;
-import main.Record;
+import main.java.Account;
+import main.java.Record;
 import main.util.RecordType;
 import org.junit.Before;
 import org.junit.Test;

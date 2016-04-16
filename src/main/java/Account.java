@@ -133,7 +133,7 @@ public class Account implements Serializable {
         if (!(obj instanceof Account)) return false;
 
         Account account = (Account) obj;
-        return (owner + description).equals(account.owner + account.description);
+        return (owner.getLogin() + description).equals(account.owner.getLogin() + account.description);
     }
 
     /**

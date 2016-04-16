@@ -199,7 +199,7 @@ public class DBHelper implements DataStore {
 
         int userId = findUserId(account.getOwner());
         if (userId == -1)
-            return null;
+            return null; // meaning the account owner doesn't exists
 
         String accountId = String.format("%s%s", userId, account.getDescription());
         return accountId;
@@ -220,7 +220,7 @@ public class DBHelper implements DataStore {
 
         String accountId = findAccountId(account);
         if (accountId == null)
-            return null;
+            return null; // meaning that now such account exists
 
         String recordID = String.format("%s%d", accountId, record.getLongDate());
         return recordID;
@@ -258,6 +258,7 @@ public class DBHelper implements DataStore {
                 pass.setAccessible(false);
             }
 
+            // add all of the accounts that belong to user
             getAccounts(user)
                     .forEach(user::addAccount);
         } catch (SQLException e) {
@@ -314,7 +315,7 @@ public class DBHelper implements DataStore {
         try {
             int userId = findUserId(owner);
             if (userId == -1)
-                return result;
+                return result; // meaning no such user found in the table
 
             stmt = con.createStatement();
             rs = stmt.executeQuery("SELECT DESCRIPTION FROM accounts WHERE USER_ID = '" + userId + "';");
@@ -323,6 +324,7 @@ public class DBHelper implements DataStore {
                 String desc = rs.getString(1);
                 Account account = new Account(owner, desc);
 
+                // adding records to account
                 getRecords(account)
                         .forEach(account::addRecord);
 
@@ -354,7 +356,7 @@ public class DBHelper implements DataStore {
         try {
             int userId = findUserId(account.getOwner());
             if (userId == -1)
-                return result;
+                return result; // meaning account owner doesn't exists in the table
 
             String accountId = findAccountId(account);
             prStmt = con.prepareStatement("SELECT * FROM records WHERE ACCOUNT_ID = ?");
@@ -419,7 +421,7 @@ public class DBHelper implements DataStore {
         try {
             int userId = findUserId(user);
             if (userId == -1)
-                return;
+                return; // if input is invalid, and this user doesn't exists
 
             // inserting account
             String accountId = findAccountId(account);
@@ -446,14 +448,13 @@ public class DBHelper implements DataStore {
     public void addRecord(Account account, Record record) {
         if (isConnectionClosed())
             return;
-
         if (account == null || record == null)
             return;
 
         try {
             int userId = findUserId(account.getOwner());
             if (userId == -1)
-                return;
+                return; // if input is invalid, and owner of account isn't really the owner
 
             // if we found the account, then adding record to it
             String accountId = findAccountId(account);
@@ -475,6 +476,7 @@ public class DBHelper implements DataStore {
             else if (record.getType() == RecordType.DEPOSIT)
                 amount = record.getAmount();
 
+            // updating account balance
             stmt = con.createStatement();
             stmt.executeUpdate("UPDATE accounts SET BALANCE = BALANCE + " + amount + " WHERE ACCOUNT_ID = '" + accountId + "';");
         } catch (SQLException e) {
@@ -534,7 +536,7 @@ public class DBHelper implements DataStore {
         if (owner == null || account == null)
             return null;
         if (findUserId(owner) == -1 || findAccountId(account) == null)
-            return null;
+            return null; // if inputs are invalid, like no such account or user
 
         Optional<Account> optAcc = getAccounts(owner)
                 .parallelStream()
@@ -579,7 +581,7 @@ public class DBHelper implements DataStore {
         if (from == null || record == null)
             return null;
         if (findUserId(from.getOwner()) == -1 || findAccountId(from) == null)
-            return null;
+            return null; // if inputs are invalid, like no such account owner or account itself
 
         Optional<Record> optRec = getRecords(from)
                 .parallelStream()

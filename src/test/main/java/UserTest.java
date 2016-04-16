@@ -1,5 +1,5 @@
-import main.Account;
-import main.User;
+package main.java;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,10 +16,8 @@ public class UserTest {
     public void setUp() throws Exception {
         user = new User("kos", "kostya");
 
-        initialBalance = 1000;
-
-        account1 = new Account(initialBalance, "account with initial balance");
-        account2 = new Account("account with zero balance");
+        account1 = new Account(user, "account with initial balance");
+        account2 = new Account(user, "account with zero balance");
     }
 
     @Test
@@ -68,11 +66,11 @@ public class UserTest {
 
     @Test
     public void checkPassword() throws Exception {
-        assertTrue(user.checkPassword("kostya"));
+        assertTrue(user.checkMD5Password("kostya"));
 
-        assertFalse(user.checkPassword("kostyA")); // wrong
-        assertFalse(user.checkPassword("kos")); // less than 5
-        assertFalse(user.checkPassword("kostyakostyakostyakostya")); // longer than 15
+        assertFalse(user.checkMD5Password("kostyA")); // wrong
+        assertFalse(user.checkMD5Password("kos")); // less than 5
+        assertFalse(user.checkMD5Password("kostyakostyakostyakostya")); // longer than 15
     }
 
     @Test

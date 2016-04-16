@@ -1,4 +1,4 @@
-package main;
+package main.java;
 
 import main.util.MD5;
 
@@ -26,6 +26,20 @@ public class User implements Serializable {
     }
 
     /**
+     * @return User login
+     */
+    public String getLogin() {
+        return login;
+    }
+
+    /**
+     * @return User password hash
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
      * Method to change password
      *
      * @param oldPassword old password
@@ -33,7 +47,7 @@ public class User implements Serializable {
      * @throws IllegalArgumentException if passwords don't match or new password is < 5 or >= 15 character long
      */
     public void changePassword(String oldPassword, String newPassword) {
-        if (!checkPassword(oldPassword))
+        if (!checkMD5Password(oldPassword))
             throw new IllegalArgumentException("passwords don't match or new password is < 5 or >= 15 character long");
 
         try {
@@ -57,12 +71,21 @@ public class User implements Serializable {
     }
 
     /**
+     * Method to check whether given hash is THE password
+     *
+     * @param password password to check
+     */
+    public boolean checkMD5Password(String password) {
+        return MD5.isEquals(this.password, password);
+    }
+
+    /**
      * Method to check whether given password is THE password
      *
      * @param password password to check
      */
-    public boolean checkPassword(String password) {
-        return MD5.isEquals(this.password, password);
+    public boolean checkStringPassword(String password) {
+        return this.password.equals(password);
     }
 
     /**

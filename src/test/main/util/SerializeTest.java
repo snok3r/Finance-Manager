@@ -29,31 +29,31 @@ public class SerializeTest {
         usersToDeserialize = new ArrayList<>(3);
 
         User user = new User("AlexeyIgorevich", "ja-#*d2d");
-        Account account = new Account("RUB account");
-        account.addRecord(new Record(time, 40000, RecordType.DEPOSIT, "Month Pay"));
-        account.addRecord(new Record(time, 1000, RecordType.WITHDRAW, "Flower Shop"));
-        account.addRecord(new Record(time, 4000, RecordType.WITHDRAW, "Candy Shop"));
-        account.addRecord(new Record(time, 6000, RecordType.WITHDRAW, "Restaurant"));
+        Account account = new Account(user, "RUB account");
+        account.addRecord(new Record(time, 40000, RecordType.DEPOSIT, Category.Other, "Month Pay"));
+        account.addRecord(new Record(time, 1000, RecordType.WITHDRAW, Category.Flowers, "Flower Shop"));
+        account.addRecord(new Record(time, 4000, RecordType.WITHDRAW, Category.Food, "Candy Shop"));
+        account.addRecord(new Record(time, 6000, RecordType.WITHDRAW, Category.Food, "Restaurant"));
         user.addAccount(account);
         usersToSerialize.add(user);
 
         user = new User("EgorMaximych", "a&+s32l");
-        account = new Account("EUR account");
-        account.addRecord(new Record(time, 3000, RecordType.DEPOSIT, "Month Pay"));
-        account.addRecord(new Record(time, 100, RecordType.WITHDRAW, "Cable"));
-        account.addRecord(new Record(time, 50, RecordType.WITHDRAW, "Supermarket"));
+        account = new Account(user, "EUR account");
+        account.addRecord(new Record(time, 3000, RecordType.DEPOSIT, Category.Other, "Month Pay"));
+        account.addRecord(new Record(time, 100, RecordType.WITHDRAW, Category.Entertainment, "Cable"));
+        account.addRecord(new Record(time, 50, RecordType.WITHDRAW, Category.Food, "Supermarket"));
         user.addAccount(account);
-        account = new Account("USD account");
-        account.addRecord(new Record(time, 1000, RecordType.DEPOSIT, "Month Pay"));
-        account.addRecord(new Record(time, 10, RecordType.WITHDRAW, "Netflix"));
+        account = new Account(user, "USD account");
+        account.addRecord(new Record(time, 1000, RecordType.DEPOSIT, Category.Other, "Month Pay"));
+        account.addRecord(new Record(time, 10, RecordType.WITHDRAW, Category.Entertainment, "Netflix"));
         user.addAccount(account);
         usersToSerialize.add(user);
 
         user = new User("FelixDzerzhinskyy", "daklj@#fa");
-        account = new Account("USD account");
-        account.addRecord(new Record(time, 5000, RecordType.DEPOSIT, "Month Pay"));
-        account.addRecord(new Record(time, 200, RecordType.WITHDRAW, "Book Store"));
-        account.addRecord(new Record(time, 200, RecordType.WITHDRAW, "Supermarket"));
+        account = new Account(user, "USD account");
+        account.addRecord(new Record(time, 5000, RecordType.DEPOSIT, Category.Other, "Month Pay"));
+        account.addRecord(new Record(time, 200, RecordType.WITHDRAW, Category.Books, "Book Store"));
+        account.addRecord(new Record(time, 200, RecordType.WITHDRAW, Category.Food, "Supermarket"));
         user.addAccount(account);
         usersToSerialize.add(user);
     }

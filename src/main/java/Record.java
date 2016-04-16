@@ -1,5 +1,6 @@
 package main.java;
 
+import main.util.Category;
 import main.util.MD5;
 import main.util.RecordType;
 
@@ -12,6 +13,7 @@ public class Record implements Serializable {
     private final long date;
     private float amount;
     private RecordType type;
+    private Category category;
     private final String description;
 
     private final static SimpleDateFormat simpleDate
@@ -25,26 +27,29 @@ public class Record implements Serializable {
      * @param date        long number date of transaction
      * @param amount      transaction amount
      * @param type        transaction type (RecordType.WITHDRAW or RecordType.DEPOSIT)
+     * @param category    transaction category (eg. Category.Health, Category.Travel, etc.)
      * @param description transaction description
      */
-    public Record(long date, float amount, RecordType type, String description) {
+    public Record(long date, float amount, RecordType type, Category category, String description) {
         this.date = date;
         this.amount = amount;
         this.type = type;
+        this.category = category;
         this.description = description;
     }
 
     /**
      * Initialize Record with transaction amount,
      * transaction type and transaction description.
-     * Date of the transaction sets automatically (now date).
+     * Date of the transaction sets automatically (current date).
      *
      * @param amount      transaction amount
      * @param type        transaction type (RecordType.WITHDRAW or RecordType.DEPOSIT)
+     * @param category    transaction category (eg. Category.Health, Category.Travel, etc.)
      * @param description transaction description
      */
-    public Record(float amount, RecordType type, String description) {
-        this(new java.util.Date().getTime(), amount, type, description);
+    public Record(float amount, RecordType type, Category category, String description) {
+        this(new java.util.Date().getTime(), amount, type, category, description);
     }
 
     /**
@@ -54,10 +59,11 @@ public class Record implements Serializable {
      * @param date        java.sql.Date of transaction
      * @param amount      transaction amount
      * @param type        transaction type (RecordType.WITHDRAW or RecordType.DEPOSIT)
+     * @param category    transaction category (eg. Category.Health, Category.Travel, etc.)
      * @param description transaction description
      */
-    public Record(Date date, float amount, RecordType type, String description) {
-        this(date.getTime(), amount, type, description);
+    public Record(Date date, float amount, RecordType type, Category category, String description) {
+        this(date.getTime(), amount, type, category, description);
     }
 
     /**
@@ -67,10 +73,11 @@ public class Record implements Serializable {
      * @param date        java.util.Date of transaction
      * @param amount      transaction amount
      * @param type        transaction type (RecordType.WITHDRAW or RecordType.DEPOSIT)
+     * @param category    transaction category (eg. Category.Health, Category.Travel, etc.)
      * @param description transaction description
      */
-    public Record(java.util.Date date, float amount, RecordType type, String description) {
-        this(date.getTime(), amount, type, description);
+    public Record(java.util.Date date, float amount, RecordType type, Category category, String description) {
+        this(date.getTime(), amount, type, category, description);
     }
 
     /**
@@ -102,6 +109,13 @@ public class Record implements Serializable {
     }
 
     /**
+     * @return transaction category (eg. Health, Travel, etc.)
+     */
+    public Category getCategory() {
+        return category;
+    }
+
+    /**
      * @return transaction description
      */
     public String getDescription() {
@@ -125,7 +139,7 @@ public class Record implements Serializable {
     @Override
     public int hashCode() {
         if (hash == 0) {
-            String str = String.format("%d%f%s%s", date, amount, type.ordinal(), description);
+            String str = String.format("%d%f%d%d%s", date, amount, type.ordinal(), category.ordinal(), description);
             hash = MD5.getHash(str).hashCode();
         }
         return hash;
@@ -133,6 +147,6 @@ public class Record implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s. %s %.2f %s", description, simpleDate.format(getDate()), amount, type);
+        return String.format("%s. %s. %s %.2f %s", category, description, simpleDate.format(getDate()), amount, type);
     }
 }

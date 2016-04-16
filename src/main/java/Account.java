@@ -1,5 +1,6 @@
 package main.java;
 
+import main.util.MD5;
 import main.util.RecordType;
 
 import java.io.Serializable;
@@ -8,29 +9,36 @@ import java.util.Set;
 
 public class Account implements Serializable {
 
+    private User owner;
     private String description;
     private float balance;
     private final Set<Record> records;
+    private int hash;
 
     /**
-     * Initialize account with description and zero balance
+     * Initialize account with User owner,
+     * description and zero balance
      *
+     * @param owner       owner of the account
      * @param description description of the account
      */
-    public Account(String description) {
+    public Account(User owner, String description) {
+        this.owner = owner;
         this.description = description;
         this.balance = 0.0f;
         this.records = new LinkedHashSet<>();
     }
 
     /**
-     * Initialize account with start balance and description
+     * Initialize account with User owner,
+     * start balance and description
      *
+     * @param owner       owner of the account
      * @param balance     starting balance
      * @param description description of the account
      */
-    public Account(float balance, String description) {
-        this(description);
+    public Account(User owner, float balance, String description) {
+        this(owner, description);
         this.balance = balance;
     }
 
@@ -88,6 +96,13 @@ public class Account implements Serializable {
     }
 
     /**
+     * @return account owner
+     */
+    public User getOwner() {
+        return owner;
+    }
+
+    /**
      * @return balance of the account
      */
     public float getBalance() {
@@ -122,6 +137,26 @@ public class Account implements Serializable {
      */
     public int getNumOfRecords() {
         return records.size();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null) return false;
+        if (!(obj instanceof Account)) return false;
+
+        Account account = (Account) obj;
+        return (owner + description).equals(account.owner + account.description);
+    }
+
+    /**
+     * Making hash with <tt>owner</tt>
+     */
+    @Override
+    public int hashCode() {
+        if (hash == 0)
+            hash = MD5.getHash(owner.getLogin() + description).hashCode();
+        return hash;
     }
 
     @Override

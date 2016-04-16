@@ -2,6 +2,7 @@ package main.java;
 
 import main.java.Account;
 import main.java.Record;
+import main.util.Category;
 import main.util.RecordType;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,13 +19,13 @@ public class AccountTest {
 
     @Before
     public void setUp() throws Exception {
-        account = new Account("Test account");
+        account = new Account(new User("admin", "admin"), "Test account");
 
         depositAmount = amounts[new java.util.Random().nextInt(amounts.length)];
         withdrawAmount = amounts[new java.util.Random().nextInt(amounts.length)];
 
-        recordD = new Record(new java.util.Date().getTime(), depositAmount, RecordType.DEPOSIT, "deposit 2000");
-        recordW = new Record(new java.util.Date().getTime(), withdrawAmount, RecordType.WITHDRAW, "Withdraw 1000");
+        recordD = new Record(new java.util.Date().getTime(), depositAmount, RecordType.DEPOSIT, Category.Other, "deposit 2000");
+        recordW = new Record(new java.util.Date().getTime(), withdrawAmount, RecordType.WITHDRAW, Category.Clothes, "Withdraw 1000");
     }
 
     @Test

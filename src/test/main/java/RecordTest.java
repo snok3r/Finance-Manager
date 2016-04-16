@@ -1,6 +1,7 @@
 package main.java;
 
 import main.java.Record;
+import main.util.Category;
 import main.util.RecordType;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,11 +23,11 @@ public class RecordTest {
 
         date = new java.util.Date().getTime();
 
-        recordDif1 = new Record(amountDif1, RecordType.WITHDRAW, "test");
-        recordDif2 = new Record(amountDif2, RecordType.DEPOSIT, "test");
+        recordDif1 = new Record(amountDif1, RecordType.WITHDRAW, Category.Books, "test");
+        recordDif2 = new Record(amountDif2, RecordType.DEPOSIT, Category.Food, "test");
 
-        recordEq1 = new Record(date, amountEq, RecordType.WITHDRAW, "test");
-        recordEq2 = new Record(date, amountEq, RecordType.WITHDRAW, "test");
+        recordEq1 = new Record(date, amountEq, RecordType.WITHDRAW, Category.Travel, "test");
+        recordEq2 = new Record(date, amountEq, RecordType.WITHDRAW, Category.Travel, "test");
     }
 
     @Test

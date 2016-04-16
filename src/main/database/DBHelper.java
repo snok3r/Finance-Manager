@@ -278,8 +278,8 @@ public class DBHelper implements DataStore {
                 String desc = rs.getString(1);
                 Account account = new Account(owner, desc);
 
-                Set<Record> records = getRecords(account);
-                records.forEach(account::addRecord);
+                getRecords(account)
+                        .forEach(account::addRecord);
 
                 result.add(account);
             }
@@ -421,6 +421,15 @@ public class DBHelper implements DataStore {
             prStmt.setString(6, record.getDescription());
             prStmt.setString(7, accountId);
             prStmt.executeUpdate();
+
+            float amount = 0;
+            if (record.getType() == RecordType.WITHDRAW)
+                amount = -record.getAmount();
+            else if (record.getType() == RecordType.DEPOSIT)
+                amount = record.getAmount();
+
+            stmt = con.createStatement();
+            stmt.executeUpdate("UPDATE accounts SET BALANCE = BALANCE + " + amount + " WHERE ACCOUNT_ID = '" + accountId + "';");
         } catch (SQLException e) {
             e.printStackTrace();
         }

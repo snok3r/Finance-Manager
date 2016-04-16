@@ -17,7 +17,7 @@ public class DBHelperTest {
     private DBHelper db;
     private User user, malUserPass, malUserName;
     private Account account, malAccount;
-    private Record record;
+    private Record recordW, recordD;
 
     @Before
     public void setUp() throws Exception {
@@ -28,7 +28,8 @@ public class DBHelperTest {
         account = new Account(user, 5000, "RUB");
         malAccount = new Account(malUserPass, 5000, "RUB");
 
-        record = new Record(1460817310779l, 500, RecordType.WITHDRAW, Category.Books, "The Sound and the Fury");
+        recordW = new Record(1460817310941l, 3000, RecordType.WITHDRAW, Category.Clothes, "H&M");
+        recordD = new Record(1460817310730l, 500, RecordType.DEPOSIT, Category.Other, "Debt");
     }
 
     @Test
@@ -55,8 +56,9 @@ public class DBHelperTest {
         addAccount();
 
         db.connect();
-        db.addRecord(account, record);
-        db.addRecord(account, record);
+        db.addRecord(account, recordW);
+        db.addRecord(account, recordW);
+        db.addRecord(account, recordD);
         db.close();
     }
 

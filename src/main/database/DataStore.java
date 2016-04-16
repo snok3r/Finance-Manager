@@ -1,4 +1,8 @@
-package main;
+package main.database;
+
+import main.Account;
+import main.Record;
+import main.User;
 
 import java.util.Set;
 

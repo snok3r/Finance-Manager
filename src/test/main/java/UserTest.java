@@ -1,3 +1,5 @@
+package main.java;
+
 import main.java.Account;
 import main.java.User;
 import org.junit.Before;

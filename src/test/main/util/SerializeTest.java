@@ -1,3 +1,5 @@
+package main.util;
+
 import main.java.Account;
 import main.java.Record;
 import main.java.User;

@@ -25,8 +25,8 @@ public class DBHelperTest {
         user = new User("admin", "admin");
         malUserPass = new User("admin", "dasda");
         malUserName = new User("adla", "dasda");
-        account = new Account(user, 5000, "RUB");
-        malAccount = new Account(malUserPass, 5000, "RUB");
+        account = new Account(user, "RUB");
+        malAccount = new Account(malUserPass, "RUB");
 
         recordW = new Record(1460817310941l, 3000, RecordType.WITHDRAW, Category.Clothes, "H&M");
         recordD = new Record(1460817310730l, 500, RecordType.DEPOSIT, Category.Other, "Debt");
@@ -88,6 +88,50 @@ public class DBHelperTest {
         user = db.getUser("admin");
         assertNotNull(user);
         assertEquals(this.user, user);
+        db.close();
+    }
+
+    @Test
+    public void removeRecord() throws Exception {
+        db.connect();
+        db.removeRecord(account, recordD);
+        db.addRecord(account, recordD);
+        db.close();
+    }
+
+    @Test
+    public void removeAccount() throws Exception {
+        db.connect();
+        // not existing account
+        assertNull(db.removeAccount(user, malAccount));
+
+        // add account and records
+        db.addAccount(user, account);
+        db.addRecord(account, recordW);
+        db.addRecord(account, recordD);
+
+        // remove existing account
+        assertNotNull(db.removeAccount(user, account));
+
+        // bring back all what removed
+        addAccount();
+        addRecord();
+
+        db.close();
+    }
+
+    @Test
+    public void removeUser() throws Exception {
+        db.connect();
+
+        assertNull(db.removeUser("aloha"));
+        assertNotNull(db.removeUser("admin"));
+
+        // bring back all what removed
+        addUser();
+        addAccount();
+        addRecord();
+
         db.close();
     }
 }

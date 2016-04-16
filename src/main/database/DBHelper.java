@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class DBHelper implements DataStore {
@@ -161,6 +162,8 @@ public class DBHelper implements DataStore {
      */
     private int findUserId(User user) {
         int userId = -1;
+        if (user == null)
+            return userId;
 
         try {
             prStmt = con.prepareStatement("SELECT USER_ID, PASSWORD FROM users WHERE LOGIN = ?;");
@@ -184,6 +187,46 @@ public class DBHelper implements DataStore {
     }
 
     /**
+     * Finding ACCOUNT_ID for given <tt>account</tt>
+     *
+     * @param account account to look ACCOUNT_ID for
+     * @return ACCOUNT_ID of <tt>account</tt> or null, if not found
+     */
+    @Nullable
+    private String findAccountId(Account account) {
+        if (account == null)
+            return null;
+
+        int userId = findUserId(account.getOwner());
+        if (userId == -1)
+            return null;
+
+        String accountId = String.format("%s%s", userId, account.getDescription());
+        return accountId;
+    }
+
+    /**
+     * Finding RECORD_ID for given <tt>record</tt>
+     * associated with <tt>account</tt>
+     *
+     * @param account account associated with the <tt>record</tt>
+     * @param record  record to look RECORD_ID for
+     * @return RECORD_ID of <tt>record</tt> or null, if not found
+     */
+    @Nullable
+    private String findRecordId(Account account, Record record) {
+        if (account == null || record == null)
+            return null;
+
+        String accountId = findAccountId(account);
+        if (accountId == null)
+            return null;
+
+        String recordID = String.format("%s%d", accountId, record.getLongDate());
+        return recordID;
+    }
+
+    /**
      * Method to get User object with given <tt>name</tt>
      *
      * @param name name of User to get
@@ -196,7 +239,7 @@ public class DBHelper implements DataStore {
         User user = null;
         if (isConnectionClosed())
             return user;
-        if (!getUserNames().contains(name))
+        if (name == null || !getUserNames().contains(name))
             return user;
 
         try {
@@ -265,6 +308,8 @@ public class DBHelper implements DataStore {
         Set<Account> result = new HashSet<>(0);
         if (isConnectionClosed())
             return result;
+        if (owner == null)
+            return result;
 
         try {
             int userId = findUserId(owner);
@@ -303,13 +348,15 @@ public class DBHelper implements DataStore {
         Set<Record> result = new HashSet<>(0);
         if (isConnectionClosed())
             return result;
+        if (account == null)
+            return result;
 
         try {
             int userId = findUserId(account.getOwner());
             if (userId == -1)
                 return result;
 
-            String accountId = String.format("%s%s", userId, account.getDescription());
+            String accountId = findAccountId(account);
             prStmt = con.prepareStatement("SELECT * FROM records WHERE ACCOUNT_ID = ?");
             prStmt.setString(1, accountId);
             rs = prStmt.executeQuery();
@@ -357,7 +404,7 @@ public class DBHelper implements DataStore {
 
     /**
      * Adds <tt>account</tt> to <tt>user</tt> if
-     * user exists and user yet doesn't have the <tt>account</tt>
+     * user exists and user doesn't yet have the <tt>account</tt>
      *
      * @param user    user to add the <tt>account</tt> to
      * @param account account to add
@@ -375,7 +422,7 @@ public class DBHelper implements DataStore {
                 return;
 
             // inserting account
-            String accountId = String.format("%s%s", userId, account.getDescription());
+            String accountId = findAccountId(account);
             prStmt = con.prepareStatement("INSERT INTO accounts (ACCOUNT_ID, BALANCE, DESCRIPTION, USER_ID) " +
                     "VALUES (?, ?, ?, ?);");
             prStmt.setString(1, accountId);
@@ -409,8 +456,8 @@ public class DBHelper implements DataStore {
                 return;
 
             // if we found the account, then adding record to it
-            String accountId = String.format("%s%s", userId, account.getDescription());
-            String recordID = String.format("%s%d", accountId, record.getLongDate());
+            String accountId = findAccountId(account);
+            String recordID = findRecordId(account, record);
             prStmt = con.prepareStatement("INSERT INTO records (RECORD_ID, RECORD_DATE, AMOUNT, RECORD_TYPE, CATEGORY, DESCRIPTION, ACCOUNT_ID)" +
                     "VALUES (?, ?, ?, ?, ?, ?, ?);");
             prStmt.setString(1, recordID);
@@ -435,30 +482,135 @@ public class DBHelper implements DataStore {
         }
     }
 
+    /**
+     * Removes user by <tt>name</tt>. Returns removed
+     * user with <tt>name</tt> or null if no such user exists.
+     *
+     * @param name name of user to remove
+     * @return removed user or null if no such user exists
+     */
     @Nullable
     @Override
     public User removeUser(String name) {
         if (isConnectionClosed())
             return null;
+        if (name == null || !getUserNames().contains(name))
+            return null;
 
-        return null;
+        User toReturn = getUser(name);
+        if (toReturn == null)
+            return null;
+
+        try {
+            // removing all accounts (and recursively records)
+            Set<Account> accounts = getAccounts(toReturn);
+            accounts.forEach(account -> removeAccount(toReturn, account));
+
+            // finding USER_ID and delete the account
+            int userID = findUserId(toReturn);
+            stmt = con.createStatement();
+            stmt.executeUpdate("DELETE FROM users WHERE USER_ID = '" + userID + "';");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return toReturn;
     }
 
+    /**
+     * Removes <tt>account</tt> from <tt>user</tt> if it
+     * really belongs to <tt>user</tt>. Returns removed
+     * <tt>account</tt> or null if no such account or <tt>user</tt> exists.
+     *
+     * @param owner   owner of the <tt>account</tt> to delete
+     * @param account account to delete
+     * @return removed account or null if no such <tt>account</tt> or <tt>user</tt> exists
+     */
     @Nullable
     @Override
     public Account removeAccount(User owner, Account account) {
         if (isConnectionClosed())
             return null;
+        if (owner == null || account == null)
+            return null;
+        if (findUserId(owner) == -1 || findAccountId(account) == null)
+            return null;
 
-        return null;
+        Optional<Account> optAcc = getAccounts(owner)
+                .parallelStream()
+                .filter(account1 -> account1.equals(account))
+                .findFirst();
+
+        // if no account found return null
+        if (!optAcc.isPresent())
+            return null;
+
+        Account toReturn = optAcc.get();
+        try {
+            // removing all related records
+            Set<Record> records = getRecords(toReturn);
+            records.forEach(record -> removeRecord(toReturn, record));
+
+            // finding ACCOUNT_ID and delete the account
+            String accountId = findAccountId(toReturn);
+            stmt = con.createStatement();
+            stmt.executeUpdate("DELETE FROM accounts WHERE ACCOUNT_ID = '" + accountId + "';");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return toReturn;
     }
 
+    /**
+     * Removes <tt>record</tt> from <tt>account</tt> if it
+     * really belongs to <tt>account</tt>. Returns removed
+     * <tt>record</tt> or null if no such record or <tt>account</tt> exists.
+     *
+     * @param from   account to delete the <tt>record</tt> from
+     * @param record record to delete
+     * @return removed record or null if no such <tt>record</tt> or <tt>account</tt> exists
+     */
     @Nullable
     @Override
     public Record removeRecord(Account from, Record record) {
         if (isConnectionClosed())
             return null;
+        if (from == null || record == null)
+            return null;
+        if (findUserId(from.getOwner()) == -1 || findAccountId(from) == null)
+            return null;
 
-        return null;
+        Optional<Record> optRec = getRecords(from)
+                .parallelStream()
+                .filter(record1 -> record1.equals(record))
+                .findFirst();
+
+        // if no record found return null
+        if (!optRec.isPresent())
+            return null;
+
+        Record toReturn = optRec.get();
+        try {
+            String recordId = findRecordId(from, toReturn);
+            if (recordId == null) // making sure, that record exists and belongs to account
+                return null;
+
+            float amount = toReturn.getAmount();
+            if (toReturn.getType() == RecordType.DEPOSIT)
+                amount = -amount;
+
+            // adding transtaction amount of removing record to account it belongs
+            stmt = con.createStatement();
+            stmt.executeUpdate("UPDATE accounts SET BALANCE = BALANCE + " + amount + " WHERE ACCOUNT_ID = '" + findAccountId(from) + "';");
+
+            // deleting record from records
+            stmt = con.createStatement();
+            stmt.executeUpdate("DELETE FROM records WHERE RECORD_ID = '" + recordId + "';");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return toReturn;
     }
 }

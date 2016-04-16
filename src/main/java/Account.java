@@ -30,19 +30,6 @@ public class Account implements Serializable {
     }
 
     /**
-     * Initialize account with User owner,
-     * start balance and description
-     *
-     * @param owner       owner of the account
-     * @param balance     starting balance
-     * @param description description of the account
-     */
-    public Account(User owner, float balance, String description) {
-        this(owner, description);
-        this.balance = balance;
-    }
-
-    /**
      * Adds <tt>record</tt> to Set of records,
      * changing the balance with record.amount
      * depending on transaction type

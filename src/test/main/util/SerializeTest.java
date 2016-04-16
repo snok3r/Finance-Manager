@@ -3,8 +3,6 @@ package main.util;
 import main.java.Account;
 import main.java.Record;
 import main.java.User;
-import main.util.RecordType;
-import main.util.Serialize;
 import org.junit.Before;
 import org.junit.Test;
 

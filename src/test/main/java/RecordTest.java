@@ -1,6 +1,5 @@
 package main.java;
 
-import main.java.Record;
 import main.util.Category;
 import main.util.RecordType;
 import org.junit.Before;

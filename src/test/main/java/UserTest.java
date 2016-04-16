@@ -16,9 +16,7 @@ public class UserTest {
     public void setUp() throws Exception {
         user = new User("kos", "kostya");
 
-        initialBalance = 1000;
-
-        account1 = new Account(user, initialBalance, "account with initial balance");
+        account1 = new Account(user, "account with initial balance");
         account2 = new Account(user, "account with zero balance");
     }
 

@@ -7,21 +7,23 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS accounts (
-    ACCOUNT_ID INTEGER PRIMARY KEY AUTOINCREMENT
-                       NOT NULL,
-    BALANCE    REAL    NOT NULL,
-    DESCR      TEXT    NOT NULL,
-    USER_ID    INTEGER REFERENCES users (USER_ID) 
-                       NOT NULL
+    ACCOUNT_ID  STRING  PRIMARY KEY
+                        NOT NULL
+                        UNIQUE,
+    BALANCE     REAL    NOT NULL,
+    DESCRIPTION TEXT    NOT NULL,
+    USER_ID     INTEGER REFERENCES users (USER_ID) 
+                        NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS records (
-    RECORD_ID  INTEGER    PRIMARY KEY
-                          NOT NULL,
-    DATE       DATE       NOT NULL,
-    AMOUNT     REAL       NOT NULL,
-    TYPE       STRING (9) NOT NULL,
-    CATEGORY   STRING     NOT NULL,
-    [DESC]     TEXT       NOT NULL,
-    ACCOUNT_ID            REFERENCES accounts (ACCOUNT_ID) 
+    RECORD_ID   STRING     PRIMARY KEY
+                           NOT NULL
+                           UNIQUE,
+    RECORD_DATE DATE       NOT NULL,
+    AMOUNT      REAL       NOT NULL,
+    RECORD_TYPE STRING (9) NOT NULL,
+    CATEGORY    STRING     NOT NULL,
+    DESCRIPTION TEXT       NOT NULL,
+    ACCOUNT_ID             REFERENCES accounts (ACCOUNT_ID) 
 );

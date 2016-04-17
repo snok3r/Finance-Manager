@@ -24,9 +24,11 @@ public class DBHelper implements DataStore {
     private Statement stmt;
     private ResultSet rs;
 
+    private final DBConnection dbConnection;
     private static final DBHelper instance = new DBHelper().init();
 
     private DBHelper() {
+        dbConnection = new DBConnection("test_finance.db", "sqlite");
     }
 
     /**
@@ -64,7 +66,7 @@ public class DBHelper implements DataStore {
             return;
 
         try {
-            con = new DBConnection("test_finance.db", "sqlite").getConnection();
+            con = dbConnection.getConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -104,7 +106,7 @@ public class DBHelper implements DataStore {
      * Checks if connection is opened. Returns false if
      * connection is null.
      *
-     * @return true if connection isn't closed, false if connection
+     * @return true if connection is opened, false if connection
      * is closed, null or SQLException was thrown.
      */
     private boolean isConnectionOpened() {
@@ -119,6 +121,13 @@ public class DBHelper implements DataStore {
         }
     }
 
+    /**
+     * Checks if connection is closed. Returns true if
+     * connection is null.
+     *
+     * @return true if connection is closed, false if connection
+     * is opened, null or SQLException was thrown.
+     */
     private boolean isConnectionClosed() {
         return !isConnectionOpened();
     }
@@ -602,15 +611,28 @@ public class DBHelper implements DataStore {
             if (toReturn.getType() == RecordType.DEPOSIT)
                 amount = -amount;
 
-            // adding transtaction amount of removing record to account it belongs
+            con.setAutoCommit(false);
+            // adding transaction amount of removing record to account it belongs
             stmt = con.createStatement();
             stmt.executeUpdate("UPDATE accounts SET BALANCE = BALANCE + " + amount + " WHERE ACCOUNT_ID = '" + findAccountId(from) + "';");
 
             // deleting record from records
             stmt = con.createStatement();
             stmt.executeUpdate("DELETE FROM records WHERE RECORD_ID = '" + recordId + "';");
+            con.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                con.rollback();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        } finally {
+            try {
+                con.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         return toReturn;

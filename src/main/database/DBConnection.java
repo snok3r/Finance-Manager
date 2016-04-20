@@ -3,8 +3,12 @@ package main.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DBConnection {
+
+    private static Logger log = Logger.getLogger(DBHelper.class.getName());
 
     private final String dbName;
     private final String dbType;
@@ -49,7 +53,7 @@ public class DBConnection {
         try {
             Class.forName("org." + dbType + ".JDBC");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
         return DriverManager.getConnection("jdbc:" + dbType + ":src/db/" + dbName);
     }

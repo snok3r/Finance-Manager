@@ -16,8 +16,12 @@ import java.sql.*;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DBHelper implements DataStore {
+
+    private static Logger log = Logger.getLogger(DBHelper.class.getName());
 
     private Connection con;
     private PreparedStatement prStmt;
@@ -41,9 +45,9 @@ public class DBHelper implements DataStore {
         try {
             executeSQL("src/sql/create_tables.sql");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
         close();
 
@@ -68,7 +72,7 @@ public class DBHelper implements DataStore {
         try {
             con = dbConnection.getConnection();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
     }
 
@@ -83,22 +87,22 @@ public class DBHelper implements DataStore {
         try {
             if (rs != null) rs.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
         try {
             if (prStmt != null) prStmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
         try {
             if (stmt != null) stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
         try {
             if (con != null) con.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
     }
 
@@ -116,7 +120,7 @@ public class DBHelper implements DataStore {
         try {
             return !con.isClosed();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
             return false;
         }
     }
@@ -158,7 +162,7 @@ public class DBHelper implements DataStore {
             stmt.close();
             success = true;
         } catch (Exception e) {
-            System.err.println("Failed to Execute " + path + ". The error is " + e.getMessage());
+            log.log(Level.WARNING, "Failed to Execute " + path + ". The error is ", e);
         }
         return success;
     }
@@ -189,7 +193,7 @@ public class DBHelper implements DataStore {
                 return -1;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
 
         return userId;
@@ -271,12 +275,37 @@ public class DBHelper implements DataStore {
             getAccounts(user)
                     .forEach(user::addAccount);
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
+
+        return user;
+    }
+
+    /**
+     * Method helps acquiring User with given <tt>username</tt> and
+     * <tt>password</tt>. Returns null if either <tt>username</tt> doesn't exist
+     * or <tt>password</tt> is wrong. The other way
+     * returns User with all it's information.
+     *
+     * @param username username you want to acquire
+     * @param password password of this user
+     * @return returns found User or null,
+     * if either <tt>username</tt> or <tt>password</tt> is wrong.
+     */
+    @Nullable
+    public User acquireUser(String username, String password) {
+        if (!getUserNames().contains(username)) // no user with such username
+            return null;
+
+        User user = new User(username, password);
+        if (findUserId(user) == -1) // no such user with given password
+            user = null;
+        else
+            user = getUser(username); // constructing user and return it
 
         return user;
     }
@@ -301,7 +330,7 @@ public class DBHelper implements DataStore {
                 result.add(rs.getString(1));
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
         return result;
     }
@@ -341,7 +370,7 @@ public class DBHelper implements DataStore {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
 
         return result;
@@ -381,7 +410,7 @@ public class DBHelper implements DataStore {
                 result.add(new Record(date, amount, type, category, desc));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
 
         return result;
@@ -409,7 +438,7 @@ public class DBHelper implements DataStore {
             prStmt.setString(2, user.getPassword());
             prStmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
     }
 
@@ -442,7 +471,7 @@ public class DBHelper implements DataStore {
             prStmt.setInt(4, userId);
             prStmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
     }
 
@@ -489,7 +518,7 @@ public class DBHelper implements DataStore {
             stmt = con.createStatement();
             stmt.executeUpdate("UPDATE accounts SET BALANCE = BALANCE + " + amount + " WHERE ACCOUNT_ID = '" + accountId + "';");
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "", e);
         }
     }
 
@@ -522,7 +551,7 @@ public class DBHelper implements DataStore {
             stmt = con.createStatement();
             stmt.executeUpdate("DELETE FROM users WHERE USER_ID = '" + userID + "';");
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "", e);
         }
 
         return toReturn;
@@ -567,7 +596,7 @@ public class DBHelper implements DataStore {
             stmt = con.createStatement();
             stmt.executeUpdate("DELETE FROM accounts WHERE ACCOUNT_ID = '" + accountId + "';");
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "", e);
         }
 
         return toReturn;
@@ -621,17 +650,17 @@ public class DBHelper implements DataStore {
             stmt.executeUpdate("DELETE FROM records WHERE RECORD_ID = '" + recordId + "';");
             con.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "", e);
             try {
                 con.rollback();
             } catch (SQLException e1) {
-                e1.printStackTrace();
+                log.log(Level.SEVERE, "", e1);
             }
         } finally {
             try {
                 con.setAutoCommit(true);
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.log(Level.SEVERE, "", e);
             }
         }
 

@@ -293,7 +293,7 @@ public class DBHelper implements DataStore {
      *
      * @param username username you want to acquire
      * @param password password of this user
-     * @return returns found User or null,
+     * @return found User or null,
      * if either <tt>username</tt> or <tt>password</tt> is wrong.
      */
     @Nullable

@@ -22,19 +22,24 @@ public class LoginView {
     private JPasswordField passwordField;
 
     private static JFrame frame;
-    private static LoginView loginView = new LoginView();
+    private static LoginView loginView;
     private static DBHelper db = DBHelper.getInstance();
+
+    /**
+     * Adds listeners etc.
+     */
+    private LoginView() {
+        buttonLogin.addActionListener(e -> performAction(LoginAction.LOGIN));
+        buttonRegister.addActionListener(e -> performAction(LoginAction.REGISTER));
+    }
 
     /**
      * @return login window
      */
     public static LoginView getLoginView() {
+        if (loginView == null)
+            loginView = new LoginView();
         return loginView;
-    }
-
-    private LoginView() {
-        buttonLogin.addActionListener(e -> performAction(LoginAction.LOGIN));
-        buttonRegister.addActionListener(e -> performAction(LoginAction.REGISTER));
     }
 
     /**
@@ -59,15 +64,23 @@ public class LoginView {
                         if (user == null)
                             showError(LoginError.NO_SUCH_USER);
                         else {
-                            System.out.println("open main window");
                             hideLoginView();
+                            MainView.setUser(user);
+                            MainView.main(null);
+                            MainView.showMainView();
                         }
                         break;
                     case REGISTER:
                         if (db.getUserNames().contains(username)) // means user exists
                             showError(LoginError.USERNAME_TAKEN);
-                        else
+                        else {
                             db.addUser(new User(username, password));
+                            JOptionPane.showConfirmDialog(frame,
+                                    "Registration successful!",
+                                    "Registration completed",
+                                    JOptionPane.CLOSED_OPTION,
+                                    JOptionPane.PLAIN_MESSAGE);
+                        }
                         break;
                 }
             } finally {
@@ -139,13 +152,14 @@ public class LoginView {
      */
     public static void main(String[] args) {
         frame = new JFrame("Login");
+        loginView = getLoginView();
+
         frame.setContentPane(loginView.panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(250, 130);
         frame.setMinimumSize(new Dimension(250, 130));
         frame.setMaximumSize(new Dimension(350, 150));
         frame.setLocationRelativeTo(null);
-
         showLoginView();
     }
 }

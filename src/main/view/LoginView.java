@@ -5,14 +5,10 @@ import main.java.User;
 
 import javax.swing.*;
 import java.awt.*;
-
-enum LoginError {
-    INVALID_INPUTS, NO_SUCH_USER, USERNAME_TAKEN
-}
-
-enum LoginAction {
-    LOGIN, REGISTER
-}
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.sql.SQLException;
+import java.util.logging.Logger;
 
 public class LoginView {
     private JPanel panel;
@@ -31,6 +27,8 @@ public class LoginView {
     private LoginView() {
         buttonLogin.addActionListener(e -> performAction(LoginAction.LOGIN));
         buttonRegister.addActionListener(e -> performAction(LoginAction.REGISTER));
+        usernameField.addKeyListener(new KeyPressedInTextField());
+        passwordField.addKeyListener(new KeyPressedInTextField());
     }
 
     /**
@@ -65,9 +63,7 @@ public class LoginView {
                             showError(LoginError.NO_SUCH_USER);
                         else {
                             hideLoginView();
-                            MainView.setUser(user);
-                            MainView.main(null);
-                            MainView.showMainView();
+                            MainView.open(user);
                         }
                         break;
                     case REGISTER:
@@ -83,6 +79,8 @@ public class LoginView {
                         }
                         break;
                 }
+            } catch (SQLException e) {
+                showError(LoginError.DATABASE_ERROR);
             } finally {
                 db.close();
             }
@@ -104,7 +102,10 @@ public class LoginView {
                 strError = "Username or password is invalid.";
                 break;
             case USERNAME_TAKEN:
-                strError = "Username is already exists.";
+                strError = "Username already exists.";
+                break;
+            case DATABASE_ERROR:
+                strError = "Couldn't connect to database";
                 break;
         }
         JOptionPane.showConfirmDialog(frame,
@@ -161,5 +162,21 @@ public class LoginView {
         frame.setMaximumSize(new Dimension(350, 150));
         frame.setLocationRelativeTo(null);
         showLoginView();
+    }
+
+    class KeyPressedInTextField extends KeyAdapter {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER)
+                performAction(LoginAction.LOGIN);
+        }
+    }
+
+    enum LoginError {
+        INVALID_INPUTS, NO_SUCH_USER, USERNAME_TAKEN, DATABASE_ERROR
+    }
+
+    enum LoginAction {
+        LOGIN, REGISTER
     }
 }

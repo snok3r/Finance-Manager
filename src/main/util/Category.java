@@ -1,5 +1,5 @@
 package main.util;
 
 public enum Category {
-    Health, Food, Clothes, Travel, Books, Flowers, Entertainment, Other
+    Other, Health, Food, Clothes, Travel, Books, Flowers, Entertainment
 }

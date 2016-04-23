@@ -29,19 +29,32 @@ public class DBHelper implements DataStore {
     private ResultSet rs;
 
     private final DBConnection dbConnection;
-    private static final DBHelper instance = new DBHelper().init();
+    private static final DBHelper instance = new DBHelper();
 
     private DBHelper() {
         dbConnection = new DBConnection("test_finance.db", "sqlite");
+
+        try {
+            this.init();
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, "", e);
+        }
     }
 
     /**
      * Initializes database creating (if not exists) tables
      *
      * @return this
+     * @throws SQLException if couldn't connect to database
      */
-    private DBHelper init() {
-        connect();
+    private DBHelper init() throws SQLException {
+        try {
+            connect();
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, "", e);
+            throw e;
+        }
+
         try {
             executeSQL("src/sql/create_tables.sql");
         } catch (IOException e) {
@@ -49,6 +62,7 @@ public class DBHelper implements DataStore {
         } catch (SQLException e) {
             log.log(Level.WARNING, "", e);
         }
+
         close();
 
         return this;
@@ -64,8 +78,10 @@ public class DBHelper implements DataStore {
     /**
      * Connects to database.
      * Returns if connection is opened.
+     *
+     * @throws SQLException if couldn't connect to database
      */
-    public void connect() {
+    public void connect() throws SQLException {
         if (isConnectionOpened())
             return;
 
@@ -73,6 +89,7 @@ public class DBHelper implements DataStore {
             con = dbConnection.getConnection();
         } catch (SQLException e) {
             log.log(Level.WARNING, "", e);
+            throw e;
         }
     }
 
@@ -97,7 +114,7 @@ public class DBHelper implements DataStore {
         try {
             if (stmt != null) stmt.close();
         } catch (SQLException e) {
-            log.log(Level.WARNING, "", e);
+            log.log(Level.FINE, "", e);
         }
         try {
             if (con != null) con.close();

@@ -124,6 +124,18 @@ public class User implements Serializable {
     }
 
     /**
+     * @return first account
+     */
+    public Account getDefaultAccount() {
+        Account toRet = null;
+        for (Account acc : accounts) {
+            toRet = acc;
+            break;
+        }
+        return toRet;
+    }
+
+    /**
      * Method to get number of accounts
      *
      * @return number of accounts user has

@@ -26,7 +26,6 @@ public class DBHelper implements DataStore {
     private Connection con;
 
     private final DBConnection dbConnection;
-    private static final DBHelper instance = new DBHelper();
 
     private DBHelper() {
         dbConnection = new DBConnection("test_finance.db", "sqlite");
@@ -66,10 +65,17 @@ public class DBHelper implements DataStore {
     }
 
     /**
+     * Holder for DBHelper instance (on demand)
+     */
+    private static class DBHelperHolder {
+        private static final DBHelper instance = new DBHelper();
+    }
+
+    /**
      * @return instance of the class
      */
     public static DBHelper getInstance() {
-        return instance;
+        return DBHelperHolder.instance;
     }
 
     /**

@@ -5,8 +5,6 @@ import main.java.User;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.sql.SQLException;
 
 public class LoginView {
@@ -26,8 +24,8 @@ public class LoginView {
     private LoginView() {
         buttonLogin.addActionListener(e -> performAction(LoginAction.LOGIN));
         buttonRegister.addActionListener(e -> performAction(LoginAction.REGISTER));
-        usernameField.addKeyListener(new KeyPressedInTextField());
-        passwordField.addKeyListener(new KeyPressedInTextField());
+        usernameField.addActionListener(e -> performAction(LoginAction.LOGIN));
+        passwordField.addActionListener(e -> performAction(LoginAction.LOGIN));
     }
 
     /**
@@ -161,14 +159,6 @@ public class LoginView {
         frame.setMaximumSize(new Dimension(350, 150));
         frame.setLocationRelativeTo(null);
         showLoginView();
-    }
-
-    class KeyPressedInTextField extends KeyAdapter {
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_ENTER)
-                performAction(LoginAction.LOGIN);
-        }
     }
 
     enum LoginError {

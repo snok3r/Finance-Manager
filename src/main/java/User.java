@@ -124,15 +124,27 @@ public class User implements Serializable {
     }
 
     /**
-     * @return first account
+     * Method to get account by its description
+     *
+     * @param desc description of the account you need
+     * @return account with this <tt>desc</tt> or null,
+     * if not found any.
      */
-    public Account getDefaultAccount() {
-        Account toRet = null;
-        for (Account acc : accounts) {
-            toRet = acc;
-            break;
-        }
-        return toRet;
+    public Account getAccount(String desc) {
+        return accounts
+                .stream()
+                .filter(a -> a.getDescription().equals(desc))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Method to get user accounts
+     *
+     * @return accounts of this user
+     */
+    public Set<Account> getAccounts() {
+        return accounts;
     }
 
     /**

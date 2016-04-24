@@ -9,7 +9,6 @@ public class UserTest {
 
     private User user;
     private Account account1, account2;
-    private float initialBalance;
     private float delta = 0.1f;
 
     @Before
@@ -31,6 +30,7 @@ public class UserTest {
         try {
             user.changePassword("kosya", "fa-da*f2");
             res = fail;
+            fail();
         } catch (IllegalArgumentException e) {
             res = ok;
         }
@@ -40,6 +40,7 @@ public class UserTest {
         try {
             user.changePassword("kostya", "f");
             res = fail;
+            fail();
         } catch (IllegalArgumentException e) {
             res = ok;
         }
@@ -49,6 +50,7 @@ public class UserTest {
         try {
             user.changePassword("kostya", "fa-da*f2dasdhg2j3gjhgsfjhsa");
             res = fail;
+            fail();
         } catch (IllegalArgumentException e) {
             res = ok;
         }
@@ -60,6 +62,7 @@ public class UserTest {
             res = ok;
         } catch (IllegalArgumentException e) {
             res = fail;
+            fail();
         }
         System.out.printf("valid old and valid new passwords: %s", res);
     }
@@ -155,4 +158,13 @@ public class UserTest {
         assertFalse(userDif.equals(userEq2));
     }
 
+    @Test
+    public void getAccount() throws Exception {
+        user.addAccount(account1);
+        user.addAccount(account2);
+
+        assertNotNull(user.getAccount("account with initial balance"));
+        assertNotNull(user.getAccount("account with zero balance"));
+        assertNull(user.getAccount("test"));
+    }
 }

@@ -24,9 +24,6 @@ public class DBHelper implements DataStore {
     private static Logger log = Logger.getLogger(DBHelper.class.getName());
 
     private Connection con;
-    private PreparedStatement prStmt;
-    private Statement stmt;
-    private ResultSet rs;
 
     private final DBConnection dbConnection;
     private static final DBHelper instance = new DBHelper();
@@ -94,28 +91,13 @@ public class DBHelper implements DataStore {
     }
 
     /**
-     * Closes ResultSet, Statements and Connection.
+     * Closes Connection.
      * Returns if connection is closed.
      */
     public void close() {
         if (isConnectionClosed())
             return;
 
-        try {
-            if (rs != null) rs.close();
-        } catch (SQLException e) {
-            log.log(Level.WARNING, "", e);
-        }
-        try {
-            if (prStmt != null) prStmt.close();
-        } catch (SQLException e) {
-            log.log(Level.WARNING, "", e);
-        }
-        try {
-            if (stmt != null) stmt.close();
-        } catch (SQLException e) {
-            log.log(Level.FINE, "", e);
-        }
         try {
             if (con != null) con.close();
         } catch (SQLException e) {
@@ -174,10 +156,11 @@ public class DBHelper implements DataStore {
                 sb.append(str + "\n ");
             }
             in.close();
-            Statement stmt = con.createStatement();
-            stmt.executeUpdate(sb.toString());
-            stmt.close();
-            success = true;
+            try (Statement stmt = con.createStatement()) {
+                stmt.executeUpdate(sb.toString());
+                stmt.close();
+                success = true;
+            }
         } catch (Exception e) {
             log.log(Level.WARNING, "Failed to Execute " + path + ". The error is ", e);
         }
@@ -196,19 +179,19 @@ public class DBHelper implements DataStore {
             return userId;
 
         try {
-            prStmt = con.prepareStatement("SELECT USER_ID, PASSWORD FROM users WHERE LOGIN = ?;");
-            prStmt.setString(1, user.getLogin());
-            rs = prStmt.executeQuery();
-
-            String userPass;
-            if (rs.next()) { // if user found, otherwise rs is empty
-                userId = rs.getInt(1);
-                userPass = rs.getString(2);
-                if (!user.checkStringPassword(userPass)) // checking passwords
-                    return -1;
-            } else
-                return -1;
-
+            try (PreparedStatement prStmt = con.prepareStatement("SELECT USER_ID, PASSWORD FROM users WHERE LOGIN = ?;")) {
+                prStmt.setString(1, user.getLogin());
+                try (ResultSet rs = prStmt.executeQuery()) {
+                    String userPass;
+                    if (rs.next()) { // if user found, otherwise rs is empty
+                        userId = rs.getInt(1);
+                        userPass = rs.getString(2);
+                        if (!user.checkStringPassword(userPass)) // checking passwords
+                            return -1;
+                    } else
+                        return -1;
+                }
+            }
         } catch (SQLException e) {
             log.log(Level.WARNING, "", e);
         }
@@ -274,23 +257,24 @@ public class DBHelper implements DataStore {
 
         try {
             // reconstruct user with <tt>name</tt> and corresponding password
-            prStmt = con.prepareStatement("SELECT PASSWORD FROM users WHERE LOGIN = ?;");
-            prStmt.setString(1, name);
-            rs = prStmt.executeQuery();
+            try (PreparedStatement prStmt = con.prepareStatement("SELECT PASSWORD FROM users WHERE LOGIN = ?;")) {
+                prStmt.setString(1, name);
+                try (ResultSet rs = prStmt.executeQuery()) {
+                    if (rs.next()) {
+                        user = new User(name, "123456");
 
-            if (rs.next()) {
-                user = new User(name, "123456");
+                        Class c = user.getClass();
+                        Field pass = c.getDeclaredField("password");
+                        pass.setAccessible(true);
+                        pass.set(user, rs.getString(1));
+                        pass.setAccessible(false);
+                    }
 
-                Class c = user.getClass();
-                Field pass = c.getDeclaredField("password");
-                pass.setAccessible(true);
-                pass.set(user, rs.getString(1));
-                pass.setAccessible(false);
+                    // add all of the accounts that belong to user
+                    getAccounts(user)
+                            .forEach(user::addAccount);
+                }
             }
-
-            // add all of the accounts that belong to user
-            getAccounts(user)
-                    .forEach(user::addAccount);
         } catch (SQLException e) {
             log.log(Level.WARNING, "", e);
         } catch (NoSuchFieldException e) {
@@ -340,12 +324,12 @@ public class DBHelper implements DataStore {
             return result;
 
         try {
-            stmt = con.createStatement();
-            rs = stmt.executeQuery("SELECT LOGIN FROM users;");
-
-            while (rs.next())
-                result.add(rs.getString(1));
-
+            try (Statement stmt = con.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("SELECT LOGIN FROM users;")) {
+                    while (rs.next())
+                        result.add(rs.getString(1));
+                }
+            }
         } catch (SQLException e) {
             log.log(Level.WARNING, "", e);
         }
@@ -372,18 +356,20 @@ public class DBHelper implements DataStore {
             if (userId == -1)
                 return result; // meaning no such user found in the table
 
-            stmt = con.createStatement();
-            rs = stmt.executeQuery("SELECT DESCRIPTION FROM accounts WHERE USER_ID = '" + userId + "';");
+            try (PreparedStatement prStmt = con.prepareStatement("SELECT DESCRIPTION FROM accounts WHERE USER_ID = ?;")) {
+                prStmt.setInt(1, userId);
+                try (ResultSet rs = prStmt.executeQuery()) {
+                    while (rs.next()) {
+                        String desc = rs.getString(1);
+                        Account account = new Account(owner, desc);
 
-            while (rs.next()) {
-                String desc = rs.getString(1);
-                Account account = new Account(owner, desc);
+                        // adding records to account
+                        getRecords(account)
+                                .forEach(account::addRecord);
 
-                // adding records to account
-                getRecords(account)
-                        .forEach(account::addRecord);
-
-                result.add(account);
+                        result.add(account);
+                    }
+                }
             }
 
         } catch (SQLException e) {
@@ -414,17 +400,18 @@ public class DBHelper implements DataStore {
                 return result; // meaning account owner doesn't exists in the table
 
             String accountId = findAccountId(account);
-            prStmt = con.prepareStatement("SELECT * FROM records WHERE ACCOUNT_ID = ?");
-            prStmt.setString(1, accountId);
-            rs = prStmt.executeQuery();
-
-            while (rs.next()) {
-                long date = rs.getLong(2);
-                float amount = rs.getFloat(3);
-                RecordType type = RecordType.valueOf(rs.getString(4));
-                Category category = Category.valueOf(rs.getString(5));
-                String desc = rs.getString(6);
-                result.add(new Record(date, amount, type, category, desc));
+            try (PreparedStatement preparedStatement = con.prepareStatement("SELECT * FROM records WHERE ACCOUNT_ID = ?")) {
+                preparedStatement.setString(1, accountId);
+                try (ResultSet rs = preparedStatement.executeQuery()) {
+                    while (rs.next()) {
+                        long date = rs.getLong(2);
+                        float amount = rs.getFloat(3);
+                        RecordType type = RecordType.valueOf(rs.getString(4));
+                        Category category = Category.valueOf(rs.getString(5));
+                        String desc = rs.getString(6);
+                        result.add(new Record(date, amount, type, category, desc));
+                    }
+                }
             }
         } catch (SQLException e) {
             log.log(Level.WARNING, "", e);
@@ -450,10 +437,11 @@ public class DBHelper implements DataStore {
             if (userId != -1) // user exists
                 return;
 
-            prStmt = con.prepareStatement("INSERT INTO users (LOGIN, PASSWORD) VALUES (?, ?);");
-            prStmt.setString(1, user.getLogin());
-            prStmt.setString(2, user.getPassword());
-            prStmt.executeUpdate();
+            try (PreparedStatement prStmt = con.prepareStatement("INSERT INTO users (LOGIN, PASSWORD) VALUES (?, ?);")) {
+                prStmt.setString(1, user.getLogin());
+                prStmt.setString(2, user.getPassword());
+                prStmt.executeUpdate();
+            }
         } catch (SQLException e) {
             log.log(Level.WARNING, "", e);
         }
@@ -480,13 +468,14 @@ public class DBHelper implements DataStore {
 
             // inserting account
             String accountId = findAccountId(account);
-            prStmt = con.prepareStatement("INSERT INTO accounts (ACCOUNT_ID, BALANCE, DESCRIPTION, USER_ID) " +
-                    "VALUES (?, ?, ?, ?);");
-            prStmt.setString(1, accountId);
-            prStmt.setFloat(2, account.getBalance());
-            prStmt.setString(3, account.getDescription());
-            prStmt.setInt(4, userId);
-            prStmt.executeUpdate();
+            try (PreparedStatement prStmt = con.prepareStatement("INSERT INTO accounts (ACCOUNT_ID, BALANCE, DESCRIPTION, USER_ID) " +
+                    "VALUES (?, ?, ?, ?);")) {
+                prStmt.setString(1, accountId);
+                prStmt.setFloat(2, account.getBalance());
+                prStmt.setString(3, account.getDescription());
+                prStmt.setInt(4, userId);
+                prStmt.executeUpdate();
+            }
         } catch (SQLException e) {
             log.log(Level.WARNING, "", e);
         }
@@ -514,16 +503,18 @@ public class DBHelper implements DataStore {
             // if we found the account, then adding record to it
             String accountId = findAccountId(account);
             String recordID = findRecordId(account, record);
-            prStmt = con.prepareStatement("INSERT INTO records (RECORD_ID, RECORD_DATE, AMOUNT, RECORD_TYPE, CATEGORY, DESCRIPTION, ACCOUNT_ID)" +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?);");
-            prStmt.setString(1, recordID);
-            prStmt.setDate(2, record.getDate());
-            prStmt.setFloat(3, record.getAmount());
-            prStmt.setString(4, record.getType().name());
-            prStmt.setString(5, record.getCategory().name());
-            prStmt.setString(6, record.getDescription());
-            prStmt.setString(7, accountId);
-            prStmt.executeUpdate();
+
+            try (PreparedStatement prStmt = con.prepareStatement("INSERT INTO records (RECORD_ID, RECORD_DATE, AMOUNT, RECORD_TYPE, CATEGORY, DESCRIPTION, ACCOUNT_ID)" +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?);")) {
+                prStmt.setString(1, recordID);
+                prStmt.setDate(2, record.getDate());
+                prStmt.setFloat(3, record.getAmount());
+                prStmt.setString(4, record.getType().name());
+                prStmt.setString(5, record.getCategory().name());
+                prStmt.setString(6, record.getDescription());
+                prStmt.setString(7, accountId);
+                prStmt.executeUpdate();
+            }
 
             float amount = 0;
             if (record.getType() == RecordType.WITHDRAW)
@@ -531,9 +522,12 @@ public class DBHelper implements DataStore {
             else if (record.getType() == RecordType.DEPOSIT)
                 amount = record.getAmount();
 
-            // updating account balance
-            stmt = con.createStatement();
-            stmt.executeUpdate("UPDATE accounts SET BALANCE = BALANCE + " + amount + " WHERE ACCOUNT_ID = '" + accountId + "';");
+            try (PreparedStatement prStmt = con.prepareStatement("UPDATE accounts SET BALANCE = BALANCE + ? WHERE ACCOUNT_ID = ?;")) {
+                // updating account balance
+                prStmt.setFloat(1, amount);
+                prStmt.setString(2, accountId);
+                prStmt.executeUpdate();
+            }
         } catch (SQLException e) {
             log.log(Level.WARNING, "", e);
         }
@@ -565,8 +559,9 @@ public class DBHelper implements DataStore {
 
             // finding USER_ID and delete the account
             int userID = findUserId(toReturn);
-            stmt = con.createStatement();
-            stmt.executeUpdate("DELETE FROM users WHERE USER_ID = '" + userID + "';");
+            try (Statement stmt = con.createStatement()) {
+                stmt.executeUpdate("DELETE FROM users WHERE USER_ID = '" + userID + "';");
+            }
         } catch (SQLException e) {
             log.log(Level.SEVERE, "", e);
         }
@@ -610,8 +605,9 @@ public class DBHelper implements DataStore {
 
             // finding ACCOUNT_ID and delete the account
             String accountId = findAccountId(toReturn);
-            stmt = con.createStatement();
-            stmt.executeUpdate("DELETE FROM accounts WHERE ACCOUNT_ID = '" + accountId + "';");
+            try (Statement stmt = con.createStatement()) {
+                stmt.executeUpdate("DELETE FROM accounts WHERE ACCOUNT_ID = '" + accountId + "';");
+            }
         } catch (SQLException e) {
             log.log(Level.SEVERE, "", e);
         }
@@ -658,13 +654,14 @@ public class DBHelper implements DataStore {
                 amount = -amount;
 
             con.setAutoCommit(false);
-            // adding transaction amount of removing record to account it belongs
-            stmt = con.createStatement();
-            stmt.executeUpdate("UPDATE accounts SET BALANCE = BALANCE + " + amount + " WHERE ACCOUNT_ID = '" + findAccountId(from) + "';");
-
-            // deleting record from records
-            stmt = con.createStatement();
-            stmt.executeUpdate("DELETE FROM records WHERE RECORD_ID = '" + recordId + "';");
+            try (Statement stmt = con.createStatement()) {
+                // adding transaction amount of removing record to account it belongs
+                stmt.executeUpdate("UPDATE accounts SET BALANCE = BALANCE + " + amount + " WHERE ACCOUNT_ID = '" + findAccountId(from) + "';");
+            }
+            try (Statement stmt = con.createStatement()) {
+                // deleting record from records
+                stmt.executeUpdate("DELETE FROM records WHERE RECORD_ID = '" + recordId + "';");
+            }
             con.commit();
         } catch (SQLException e) {
             log.log(Level.SEVERE, "", e);

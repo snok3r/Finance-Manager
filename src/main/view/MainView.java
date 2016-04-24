@@ -10,7 +10,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ItemEvent;
 import java.sql.SQLException;
+import java.util.Vector;
 
 public class MainView {
     private JPanel panel;
@@ -20,12 +22,13 @@ public class MainView {
     private JScrollPane scrollPane;
     private JButton buttonAddRecord;
     private JButton buttonAddAccount;
+    private JComboBox comboBoxAccounts;
 
     private static JFrame frame;
     private static MainView mainView;
     private static DBHelper db = DBHelper.getInstance();
     private static User user;
-    private static Account account;
+    private static Account currentAccount;
 
     /**
      * Adds listeners etc.
@@ -35,18 +38,30 @@ public class MainView {
             @Override
             public void componentHidden(ComponentEvent e) {
                 user = null;
+                currentAccount = null;
                 LoginView.showLoginView();
             }
         });
 
         buttonAddRecord.addActionListener(e -> {
             addRecord();
-            updateView(); // refreshing
+            updateView();
         });
 
         buttonAddAccount.addActionListener(e -> {
             addAccount();
-            updateView(); // refreshing
+            updateView();
+        });
+
+        comboBoxAccounts.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                if (String.valueOf(e.getItem()).equals("-"))
+                    return;
+
+                String desc = String.valueOf(e.getItem()).split(" ")[0];
+                currentAccount = user.getAccount(desc);
+                loadTable();
+            }
         });
     }
 
@@ -81,44 +96,35 @@ public class MainView {
      */
     public static void open(User user) {
         MainView.user = user;
-        if (user.getNumOfAccounts() != 0)
-            MainView.account = user.getDefaultAccount();
         main(null);
-        getMainView().setView();
-    }
-
-    /**
-     * Call after open(User user) and main(String[] args) are done
-     */
-    private void setView() {
-        updateView();
+        getMainView().loadAccounts();
+        String currentAcc = getMainView().comboBoxAccounts.getSelectedItem().toString().split(" ")[0];
+        currentAccount = user.getAccount(currentAcc);
+        getMainView().loadTable();
         showMainView();
     }
 
     /**
-     * Updates view (loads tables and updates balance)
+     * Updates view (loads tables and account list)
      */
     private void updateView() {
-        labelUserInfo.setText(String.format(
-                "%s (%.2f)",
-                user.getLogin(), user.getUserBalance())
-        );
+        loadAccounts();
         loadTable();
     }
 
     /**
-     * Loads records from user account into the
+     * Loads records from user currentAccount into the
      * table
      */
     private void loadTable() {
         Object[] columnNames = {"Date", "Category", "Sum", "Description"};
         Object[][] data = null;
 
-        if (user.getNumOfAccounts() != 0) {
-            int numOfRecords = account.getNumOfRecords();
+        if (currentAccount != null) {
+            int numOfRecords = currentAccount.getNumOfRecords();
             data = new Object[numOfRecords][columnNames.length];
 
-            Object[] recordsArray = account.getRecords().toArray();
+            Object[] recordsArray = currentAccount.getRecords().toArray();
 
             for (int j = 0; j < numOfRecords; j++) {
                 Record record = ((Record) recordsArray[j]);
@@ -128,7 +134,7 @@ public class MainView {
                 float amount = record.getAmount();
                 if (record.getType() == RecordType.WITHDRAW)
                     amount = -amount;
-                data[j][2] = amount;
+                data[j][2] = String.format("%.2f", amount);
 
                 data[j][3] = record.getDescription();
             }
@@ -136,6 +142,25 @@ public class MainView {
 
         tableRecords.setModel(new DefaultTableModel(data, columnNames));
         tableRecords.setDefaultEditor(Object.class, null);
+    }
+
+    /**
+     * Adds all of user's accounts into combo box
+     */
+    private void loadAccounts() {
+        Vector<String> accounts = new Vector<>();
+
+        if (user.getNumOfAccounts() != 0) {
+            for (Account a : user.getAccounts())
+                accounts.add(String.format(
+                        "%s (%.2f)",
+                        a.getDescription(),
+                        a.getBalance())
+                );
+        } else
+            accounts.add("-");
+
+        comboBoxAccounts.setModel(new DefaultComboBoxModel<>(accounts));
     }
 
     /**
@@ -156,9 +181,9 @@ public class MainView {
         Record recordToAdd = new Record(amount, recordType, category, desc);
         try {
             db.connect();
-            db.addRecord(account, recordToAdd);
+            db.addRecord(currentAccount, recordToAdd);
             db.close();
-            account.addRecord(recordToAdd);
+            currentAccount.addRecord(recordToAdd);
             showModal("Record has been added!", "Add Record", JOptionPane.CLOSED_OPTION, JOptionPane.PLAIN_MESSAGE);
         } catch (SQLException e) {
             showModal("Record has not been added!", "Add Record", JOptionPane.CLOSED_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -168,7 +193,7 @@ public class MainView {
     }
 
     /**
-     * Adds account to database and current user.
+     * Adds currentAccount to database and current user.
      * If something went wrong with <tt>db</tt>, does nothing.
      */
     private void addAccount() {
@@ -184,8 +209,7 @@ public class MainView {
             db.addAccount(user, account);
             db.close();
             user.addAccount(account);
-            if (user.getNumOfAccounts() == 1)
-                MainView.account = user.getDefaultAccount();
+            currentAccount = account;
             showModal("Account has been added!", "Add Account", JOptionPane.CLOSED_OPTION, JOptionPane.PLAIN_MESSAGE);
         } catch (SQLException e) {
             showModal("Account has not been added!", "Add Account", JOptionPane.CLOSED_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -202,6 +226,8 @@ public class MainView {
     public static void main(String[] args) {
         frame = new JFrame("Finance Manager > " + user.getLogin());
         mainView = new MainView();
+
+        mainView.labelUserInfo.setText(user.getLogin());
 
         frame.setContentPane(mainView.panel);
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);

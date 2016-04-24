@@ -23,7 +23,7 @@ public class AccountAdd extends JDialog {
         return description;
     }
 
-    public AccountAdd() {
+    private AccountAdd() {
         setLocationRelativeTo(getParent());
         setMinimumSize(new Dimension(330, 120));
         setMaximumSize(new Dimension(330, 120));

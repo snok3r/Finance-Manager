@@ -8,7 +8,6 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.SQLException;
-import java.util.logging.Logger;
 
 public class LoginView {
     private JPanel panel;

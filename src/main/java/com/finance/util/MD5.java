@@ -38,6 +38,8 @@ public class MD5 {
      *
      * @param hashedStr already hashed string
      * @param str       string to: first getHash and then check
+     * @return true if <tt>hashedStr</tt> equals to hashed <tt>str</tt>,
+     * false otherwise
      */
     static public boolean isEquals(String hashedStr, String str) {
         return hashedStr.equals(getHash(str));

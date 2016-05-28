@@ -147,6 +147,8 @@ public class LoginView {
 
     /**
      * Initializes components and listeners
+     *
+     * @param args dummy
      */
     public static void main(String[] args) {
         frame = new JFrame("Login");

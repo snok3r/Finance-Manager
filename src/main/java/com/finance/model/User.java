@@ -17,7 +17,7 @@ public class User implements Serializable {
      * Initialize user with login and password
      *
      * @param login    any set of characters
-     * @param password password, must be >= 5 and < 15 character long
+     * @param password password, must be greater or equal than 5 and less than 15 character long
      */
     public User(String login, String password) {
         this.login = login;
@@ -43,8 +43,9 @@ public class User implements Serializable {
      * Method to change password
      *
      * @param oldPassword old password
-     * @param newPassword new password, must be >= 5 and < 15 character long
-     * @throws IllegalArgumentException if passwords don't match or new password is < 5 or >= 15 character long
+     * @param newPassword new password, must be greater or equal than 5 and less 15 character long
+     * @throws IllegalArgumentException if passwords don't match or new password is less 5 or equal
+     *                                  or greater than 15 character long
      */
     @Deprecated
     public void changePassword(String oldPassword, String newPassword) {
@@ -59,10 +60,10 @@ public class User implements Serializable {
     }
 
     /**
-     * Private method to set password, accepts passwords >= 5 and < 15 character long
+     * Private method to set password, accepts passwords greater or equal than 5 and less than 15 character long
      *
      * @param password password to set
-     * @throws IllegalArgumentException if password is < 5 or >= 15 character long
+     * @throws IllegalArgumentException if password is less than 5 or greater or equal than 15 character long
      */
     private void setPassword(String password) {
         if (password.length() >= 5 && password.length() < 15)
@@ -75,6 +76,7 @@ public class User implements Serializable {
      * Method to check whether given hash is THE password
      *
      * @param password password to check
+     * @return true if <tt>password</tt> matches THE password, false otherwise
      */
     public boolean checkMD5Password(String password) {
         return MD5.isEquals(this.password, password);
@@ -84,6 +86,7 @@ public class User implements Serializable {
      * Method to check whether given password is THE password
      *
      * @param password password to check
+     * @return true if <tt>password</tt> matches THE password, false otherwise
      */
     public boolean checkStringPassword(String password) {
         return this.password.equals(password);

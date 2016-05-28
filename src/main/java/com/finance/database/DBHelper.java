@@ -24,22 +24,39 @@ public class DBHelper implements DataStore {
     private final DBConnection dbConnection;
 
     private DBHelper() {
-        dbConnection = new DBConnection("test_finance.db", "sqlite");
+        dbConnection = new DBConnection("finance.db", "sqlite");
 
         try {
-            this.init();
+            init();
         } catch (SQLException e) {
             log.log(Level.SEVERE, "", e);
         }
     }
 
     /**
-     * Initializes com.finance.database creating (if not exists) tables
+     * Checking if tables in database were created
      *
-     * @return this
-     * @throws SQLException if couldn't connect to com.finance.database
+     * @return true if tables exists, false otherwise
      */
-    private DBHelper init() throws SQLException {
+    private boolean dbExists() {
+        try {
+            try (Statement statement = con.createStatement()) {
+                statement.execute("SELECT 1 FROM users LIMIT 1");
+                statement.execute("SELECT 1 FROM records LIMIT 1");
+                statement.execute("SELECT 1 FROM accounts LIMIT 1");
+                return true;
+            }
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Initializes database creating (if not exists) tables
+     *
+     * @throws SQLException if couldn't connect to database
+     */
+    private void init() throws SQLException {
         try {
             connect();
         } catch (SQLException e) {
@@ -48,16 +65,17 @@ public class DBHelper implements DataStore {
         }
 
         try {
+            if (dbExists())
+                return;
+
             new SQLFileExecution().executeSQL("create_tables.sql");
         } catch (IOException e) {
             log.log(Level.WARNING, "", e);
         } catch (SQLException e) {
             log.log(Level.WARNING, "", e);
+        } finally {
+            close();
         }
-
-        close();
-
-        return this;
     }
 
     /**
@@ -75,10 +93,10 @@ public class DBHelper implements DataStore {
     }
 
     /**
-     * Connects to com.finance.database.
+     * Connects to database.
      * Returns if connection is opened.
      *
-     * @throws SQLException if couldn't connect to com.finance.database
+     * @throws SQLException if couldn't connect to database
      */
     public void connect() throws SQLException {
         if (isConnectionOpened())
@@ -384,7 +402,7 @@ public class DBHelper implements DataStore {
     }
 
     /**
-     * Adds <tt>user</tt> to com.finance.database if login is unique
+     * Adds <tt>user</tt> to database if login is unique
      *
      * @param user user to add
      */

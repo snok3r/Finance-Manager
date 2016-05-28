@@ -161,11 +161,11 @@ public class LoginView {
         showLoginView();
     }
 
-    enum LoginError {
+    private enum LoginError {
         INVALID_INPUTS, NO_SUCH_USER, USERNAME_TAKEN, DATABASE_ERROR
     }
 
-    enum LoginAction {
+    private enum LoginAction {
         LOGIN, REGISTER
     }
 }

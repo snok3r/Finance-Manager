@@ -40,7 +40,7 @@ public class LoginView {
     /**
      * Method to login into existing account or register a new one.
      * Includes checking inputs and username existence.
-     * Opens com.finance.database when called and closes when done.
+     * Opens database when called and closes when done.
      *
      * @param action LOGIN or REGISTER
      */
@@ -102,7 +102,7 @@ public class LoginView {
                 strError = "Username already exists.";
                 break;
             case DATABASE_ERROR:
-                strError = "Couldn't connect to com.finance.database";
+                strError = "Couldn't connect to database";
                 break;
         }
         JOptionPane.showConfirmDialog(frame,

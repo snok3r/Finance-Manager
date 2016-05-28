@@ -8,7 +8,7 @@ import java.util.Set;
 
 public interface DataStore {
     // return null if no such user
-    User getUser(String name);
+    User acquireUser(String username, String password);
 
     // If no users, return empty collection (not null)
     Set<String> getUserNames();
@@ -25,7 +25,7 @@ public interface DataStore {
 
     void addRecord(Account account, Record record);
 
-    // return removed com.finance.model.User or null if no such user
+    // return removed model.User or null if no such user
     User removeUser(String name);
 
     // return null if no such account

@@ -70,7 +70,7 @@ public class Record implements Serializable {
      * Initialize Record with date, transaction amount,
      * transaction type and transaction description
      *
-     * @param date        java.com.finance.util.Date of transaction
+     * @param date        java.util.Date of transaction
      * @param amount      transaction amount
      * @param type        transaction type (RecordType.WITHDRAW or RecordType.DEPOSIT)
      * @param category    transaction category (eg. Category.Health, Category.Travel, etc.)

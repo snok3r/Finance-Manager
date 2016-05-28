@@ -232,8 +232,7 @@ public class DBHelper implements DataStore {
      * @return User object with <tt>name</tt> or null,
      * if not found
      */
-    @Override
-    public User getUser(String name) {
+    private User getUser(String name) {
         User user = null;
         if (isConnectionClosed())
             return user;
@@ -282,6 +281,7 @@ public class DBHelper implements DataStore {
      * @return found User or null,
      * if either <tt>username</tt> or <tt>password</tt> is wrong.
      */
+    @Override
     public User acquireUser(String username, String password) {
         if (!getUserNames().contains(username)) // no user with such username
             return null;

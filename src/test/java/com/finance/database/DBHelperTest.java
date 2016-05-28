@@ -82,10 +82,10 @@ public class DBHelperTest {
     public void getUser() throws Exception {
         User user;
         db.connect();
-        user = db.getUser("aloha");
+        user = db.acquireUser("aloha", "****");
         assertNull(user);
 
-        user = db.getUser("admin");
+        user = db.acquireUser("admin", "admin");
         assertNotNull(user);
         assertEquals(this.user, user);
         db.close();

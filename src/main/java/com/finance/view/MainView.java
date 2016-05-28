@@ -106,7 +106,7 @@ public class MainView {
     }
 
     /**
-     * Updates com.finance.view (loads tables and account list)
+     * Updates view (loads tables and account list)
      */
     private void updateView() {
         loadAccounts();
@@ -165,7 +165,7 @@ public class MainView {
     }
 
     /**
-     * Adds record to com.finance.database and current user.
+     * Adds record to database and current user.
      * If something went wrong with <tt>db</tt>, does nothing.
      */
     private void addRecord() {
@@ -194,7 +194,7 @@ public class MainView {
     }
 
     /**
-     * Adds currentAccount to com.finance.database and current user.
+     * Adds currentAccount to database and current user.
      * If something went wrong with <tt>db</tt>, does nothing.
      */
     private void addAccount() {

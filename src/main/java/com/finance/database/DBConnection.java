@@ -14,11 +14,11 @@ public class DBConnection {
     private final String dbType;
 
     /**
-     * Sets up com.finance.database name and com.finance.database type
+     * Sets up database name and database type
      * for future connection
      *
-     * @param dbName com.finance.database file name (eg. "music.db")
-     * @param dbType com.finance.database type (eg. "sqlite", "oracle")
+     * @param dbName database file name (eg. "music.db")
+     * @param dbType database type (eg. "sqlite", "oracle")
      */
     public DBConnection(String dbName, String dbType) {
         this.dbName = dbName;
@@ -26,18 +26,18 @@ public class DBConnection {
     }
 
     /**
-     * Method to get com.finance.database name
+     * Method to get database name
      *
-     * @return returns set com.finance.database name
+     * @return returns set database name
      */
     public String getDbName() {
         return dbName;
     }
 
     /**
-     * Method to get com.finance.database type
+     * Method to get database type
      *
-     * @return returns set com.finance.database type
+     * @return returns set database type
      */
     public String getDbType() {
         return dbType;
@@ -46,7 +46,7 @@ public class DBConnection {
     /**
      * Method to get set connection
      *
-     * @return connection to com.finance.database with set <tt>dbName</tt> and <tt>dbType</tt>
+     * @return connection to database with set <tt>dbName</tt> and <tt>dbType</tt>
      * @throws SQLException if couldn't connect to <tt>dbName</tt> with <tt>dbType</tt>
      */
     public Connection getConnection() throws SQLException {

@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class RecordAdd extends JDialog {
-    private JPanel contentPane;
+
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField textFieldDescription;
@@ -21,11 +21,8 @@ public class RecordAdd extends JDialog {
     private Category category;
     private String description;
 
-    private static RecordAdd dialog;
-
     public static RecordAdd getDialog() {
-        RecordAdd.main(null);
-        return dialog;
+        return new RecordAdd();
     }
 
     public float getAmount() {
@@ -45,18 +42,27 @@ public class RecordAdd extends JDialog {
     }
 
     private RecordAdd() {
+        JPanel panel = new JPanel(new GridBagLayout());
+
         setLocationRelativeTo(getParent());
-        setMinimumSize(new Dimension(400, 170));
+        setSize(400, 140);
+        setMinimumSize(new Dimension(400, 150));
         setMaximumSize(new Dimension(600, 250));
-        setSize(600, 250);
-        setContentPane(contentPane);
+        setContentPane(panel);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
+        addComponents(panel);
+        addCategories();
+        pack();
+
+        setActions(panel);
+        setVisible(true);
+    }
+
+    private void setActions(JPanel panel) {
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
-
-        addCategories();
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -67,7 +73,7 @@ public class RecordAdd extends JDialog {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
+        panel.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
@@ -155,18 +161,70 @@ public class RecordAdd extends JDialog {
     }
 
     /**
+     * Composing components in window
+     */
+    private void addComponents(JPanel panel) {
+        buttonOK = new JButton("OK");
+        buttonCancel = new JButton("Cancel");
+        textFieldDescription = new JTextField();
+        formattedTextFieldAmount = new JFormattedTextField();
+        checkBoxWithdraw = new JCheckBox("Withdraw");
+        comboBoxCategory = new JComboBox();
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        c.gridwidth = 2;
+        c.gridx = 2;
+        c.gridy = 0;
+        panel.add(new JLabel("<html><b>Add new record</b></html>", SwingConstants.CENTER), c);
+
+
+        addLabelAndTextField("Description", 1, textFieldDescription, panel);
+        addLabelAndTextField("Amount", 2, formattedTextFieldAmount, panel);
+
+        c.gridx = 4;
+        c.gridy = 2;
+        panel.add(checkBoxWithdraw, c);
+
+        addLabelAndTextField("Category", 3, comboBoxCategory, panel);
+
+        // buttons
+        c.gridwidth = 2;
+        c.insets = new Insets(0, 0, 0, 0);
+        c.gridx = 2;
+        c.gridy = 4;
+        panel.add(buttonOK, c);
+
+        c.gridwidth = 1;
+        c.gridx = 4;
+        c.gridy = 4;
+        panel.add(buttonCancel, c);
+    }
+
+    private void addLabelAndTextField(String name, int row, JComponent component, JPanel panel) {
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(0, 5, 0, 5);
+
+        c.gridwidth = 1;
+        c.gridx = 1;
+        c.gridy = row;
+        panel.add(new JLabel(name, SwingConstants.CENTER), c);
+
+        c.weightx = 1.0;
+        c.gridwidth = 2;
+        c.gridx = 2;
+        c.gridy = row;
+        panel.add(component, c);
+    }
+
+    /**
      * Adds all categories to form
      */
     private void addCategories() {
         for (Category c : Category.values())
             comboBoxCategory.addItem(c);
-    }
-
-    public static void main(String[] args) {
-        dialog = new RecordAdd();
-        dialog.pack();
-        dialog.setVisible(true);
-        //System.exit(0); // for debugging
     }
 
     enum RecordAddCheck {

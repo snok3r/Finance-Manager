@@ -21,7 +21,7 @@ public class Record implements Serializable {
     private int hash;
 
     /**
-     * Initialize Record with date (long number), transaction amount,
+     * Initialize RecordAdd with date (long number), transaction amount,
      * transaction type and transaction description
      *
      * @param date        long number date of transaction
@@ -39,7 +39,7 @@ public class Record implements Serializable {
     }
 
     /**
-     * Initialize Record with transaction amount,
+     * Initialize RecordAdd with transaction amount,
      * transaction type and transaction description.
      * Date of the transaction sets automatically (current date).
      *
@@ -53,7 +53,7 @@ public class Record implements Serializable {
     }
 
     /**
-     * Initialize Record with date, transaction amount,
+     * Initialize RecordAdd with date, transaction amount,
      * transaction type and transaction description
      *
      * @param date        java.main.sql.Date of transaction
@@ -67,7 +67,7 @@ public class Record implements Serializable {
     }
 
     /**
-     * Initialize Record with date, transaction amount,
+     * Initialize RecordAdd with date, transaction amount,
      * transaction type and transaction description
      *
      * @param date        java.util.Date of transaction

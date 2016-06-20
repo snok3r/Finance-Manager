@@ -1,8 +1,9 @@
 package com.finance.view;
 
 import com.finance.database.DBHelper;
-
-import com.finance.model.*;
+import com.finance.model.Account;
+import com.finance.model.Record;
+import com.finance.model.User;
 import com.finance.util.Category;
 import com.finance.util.RecordType;
 
@@ -15,17 +16,12 @@ import java.awt.event.ItemEvent;
 import java.sql.SQLException;
 import java.util.Vector;
 
-public class MainView {
-    private JPanel panel;
-    private JLabel labelUserInfo;
+public class MainView extends JFrame {
     private JTable tableRecords;
-    private JPanel panelCenter;
-    private JScrollPane scrollPane;
     private JButton buttonAddRecord;
     private JButton buttonAddAccount;
     private JComboBox comboBoxAccounts;
 
-    private static JFrame frame;
     private static MainView mainView;
     private static DBHelper db = DBHelper.getInstance();
     private static User user;
@@ -35,12 +31,96 @@ public class MainView {
      * Adds listeners etc.
      */
     private MainView() {
-        frame.addComponentListener(new ComponentAdapter() {
+        super("Finance Manager");
+        JPanel panel = new JPanel(new BorderLayout());
+
+        setLocationRelativeTo(null);
+        setSize(500, 500);
+        setMinimumSize(new Dimension(500, 400));
+        setMaximumSize(new Dimension(500, 500));
+        setContentPane(panel);
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+
+        addComponent(panel);
+        addActions();
+
+        pack();
+    }
+
+    /**
+     * @return MainView window
+     */
+    public static MainView getMainView() {
+        if (mainView == null)
+            mainView = new MainView();
+        return mainView;
+    }
+
+    /**
+     * Hides MainView window
+     */
+    public void hideMainView() {
+        setVisible(false);
+    }
+
+    /**
+     * Shows MainView window
+     */
+    public void showMainView() {
+        setVisible(true);
+    }
+
+    private void addComponent(JPanel panel) {
+        JPanel nPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        c.gridx = 0;
+        c.insets = new Insets(0, 20, 0, 0);
+        nPanel.add(new JLabel("Current account:"), c);
+
+        c.weightx = 1.0;
+        c.gridwidth = 3;
+        c.gridx = 1;
+        c.insets = new Insets(0, 5, 0, 20);
+        nPanel.add(comboBoxAccounts = new JComboBox(), c);
+        panel.add(nPanel, BorderLayout.NORTH);
+
+        JPanel cPanel = new JPanel();
+        tableRecords = new JTable();
+        JScrollPane scrollPane = new JScrollPane(tableRecords);
+        tableRecords.setFillsViewportHeight(true);
+        tableRecords.setAutoCreateRowSorter(true);
+        tableRecords.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        tableRecords.setShowHorizontalLines(true);
+        tableRecords.setShowVerticalLines(true);
+        cPanel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(cPanel, BorderLayout.CENTER);
+
+        JPanel sPanel = new JPanel(new GridBagLayout());
+        c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        c.ipady = 10;
+
+        c.insets = new Insets(1, 20, 1, 0);
+        c.gridx = 0;
+        sPanel.add(buttonAddAccount = new JButton("Add Account"), c);
+
+        c.insets = new Insets(1, 10, 1, 20);
+        c.gridx = 1;
+        sPanel.add(buttonAddRecord = new JButton("Add Record"), c);
+        panel.add(sPanel, BorderLayout.SOUTH);
+    }
+
+    private void addActions() {
+        addComponentListener(new ComponentAdapter() {
             @Override
             public void componentHidden(ComponentEvent e) {
                 user = null;
                 currentAccount = null;
-                LoginView.showLoginView();
+                LoginView.getLoginWindow().showLoginWindow();
             }
         });
 
@@ -67,29 +147,6 @@ public class MainView {
     }
 
     /**
-     * @return MainView window
-     */
-    public static MainView getMainView() {
-        if (mainView == null)
-            mainView = new MainView();
-        return mainView;
-    }
-
-    /**
-     * Hides MainView window
-     */
-    public static void hideMainView() {
-        frame.setVisible(false);
-    }
-
-    /**
-     * Shows MainView window
-     */
-    public static void showMainView() {
-        frame.setVisible(true);
-    }
-
-    /**
      * Adds <tt>user</tt> to that window
      * and opens it
      *
@@ -97,12 +154,14 @@ public class MainView {
      */
     public static void open(User user) {
         MainView.user = user;
-        main(null);
         getMainView().loadAccounts();
+        getMainView().setTitle("Finance Manager > " + user.getLogin());
+
         String currentAcc = getMainView().comboBoxAccounts.getSelectedItem().toString().split(" ")[0];
         currentAccount = user.getAccount(currentAcc);
+
         getMainView().loadTable();
-        showMainView();
+        getMainView().showMainView();
     }
 
     /**
@@ -162,6 +221,11 @@ public class MainView {
             accounts.add("-");
 
         comboBoxAccounts.setModel(new DefaultComboBoxModel<>(accounts));
+        if (currentAccount != null)
+            comboBoxAccounts.setSelectedItem(String.format(
+                    "%s (%.2f)",
+                    currentAccount.getDescription(),
+                    currentAccount.getBalance()));
     }
 
     /**
@@ -218,26 +282,6 @@ public class MainView {
     }
 
     private void showModal(String msg, String title, int option, int type) {
-        JOptionPane.showConfirmDialog(frame, msg, title, option, type);
-    }
-
-    /**
-     * Initializes components and listeners
-     *
-     * @param args dummy
-     */
-    public static void main(String[] args) {
-        frame = new JFrame("Finance Manager > " + user.getLogin());
-        mainView = new MainView();
-
-        mainView.labelUserInfo.setText(user.getLogin());
-
-        frame.setContentPane(mainView.panel);
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        frame.setSize(500, 400);
-        frame.setMinimumSize(new Dimension(500, 400));
-        frame.setMaximumSize(new Dimension(600, 500));
-        frame.setLocationRelativeTo(null);
-        frame.pack();
+        JOptionPane.showConfirmDialog(this, msg, title, option, type);
     }
 }

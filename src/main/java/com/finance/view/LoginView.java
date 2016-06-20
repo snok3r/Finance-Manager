@@ -7,46 +7,117 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
 
-public class LoginView {
-    private JPanel panel;
+public class LoginView extends JFrame {
     private JButton buttonLogin;
     private JButton buttonRegister;
-    private JTextField usernameField;
-    private JPasswordField passwordField;
+    private JTextField textFieldUsername;
+    private JPasswordField textFieldPassword;
 
-    private static JFrame frame;
     private static LoginView loginView;
     private static DBHelper db = DBHelper.getInstance();
 
-    /**
-     * Adds listeners etc.
-     */
-    private LoginView() {
+    private LoginView() throws HeadlessException {
+        super("Welcome to Finance Manager!");
+
+        setSize(310, 120);
+        setMinimumSize(new Dimension(310, 120));
+        setMaximumSize(new Dimension(310, 120));
+        setResizable(false);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        addComponents();
+        pack();
+
         buttonLogin.addActionListener(e -> performAction(LoginAction.LOGIN));
         buttonRegister.addActionListener(e -> performAction(LoginAction.REGISTER));
-        usernameField.addActionListener(e -> performAction(LoginAction.LOGIN));
-        passwordField.addActionListener(e -> performAction(LoginAction.LOGIN));
+        textFieldUsername.addActionListener(e -> performAction(LoginAction.LOGIN));
+        textFieldPassword.addActionListener(e -> performAction(LoginAction.LOGIN));
     }
 
     /**
      * @return login window
      */
-    public static LoginView getLoginView() {
+    public static LoginView getLoginWindow() {
         if (loginView == null)
             loginView = new LoginView();
         return loginView;
     }
 
     /**
-     * Method to login into existing account or register a new one.
+     * Hides loginView window
+     */
+    public void hideLoginWindow() {
+        setVisible(false);
+    }
+
+    /**
+     * Shows loginView window
+     */
+    public void showLoginWindow() {
+        setVisible(true);
+    }
+
+    /**
+     * Composing components in window
+     */
+    private void addComponents() {
+        // main panel
+        JPanel panel = new JPanel(new GridBagLayout());
+
+        // labels and textfields
+        textFieldUsername = new JTextField();
+        addLabelAndTextField("Username", 0, textFieldUsername, panel);
+
+        textFieldPassword = new JPasswordField();
+        addLabelAndTextField("Password", 1, textFieldPassword, panel);
+
+        // buttons
+        buttonRegister = new JButton("Register");
+        addButton(buttonRegister, 0, 0.0, panel);
+
+        buttonLogin = new JButton("Login");
+        addButton(buttonLogin, 1, 1.0, panel);
+
+        add(panel);
+    }
+
+    private void addLabelAndTextField(String name, int row, JTextField textField, JPanel panel) {
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.ipady = 10;
+
+        c.gridx = 0;
+        c.gridy = row;
+        panel.add(new JLabel(name, SwingConstants.CENTER), c);
+
+
+        c.weightx = 1.0;
+        c.gridx = 1;
+        c.gridy = row;
+        panel.add(textField, c);
+    }
+
+    private void addButton(JButton button, int col, double weightx, JPanel panel) {
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        c.ipady = 10;
+        c.weightx = weightx;
+        c.gridx = col;
+        c.gridy = 2;
+        panel.add(button, c);
+    }
+
+    /**
+     * Method to loginView into existing account or register a new one.
      * Includes checking inputs and username existence.
      * Opens database when called and closes when done.
      *
      * @param action LOGIN or REGISTER
      */
     private void performAction(LoginAction action) {
-        String username = usernameField.getText();
-        String password = String.copyValueOf(passwordField.getPassword());
+        String username = textFieldUsername.getText();
+        String password = String.copyValueOf(textFieldPassword.getPassword());
 
         if (!checkInputs(username, password))
             showError(LoginError.INVALID_INPUTS);
@@ -59,7 +130,7 @@ public class LoginView {
                         if (user == null)
                             showError(LoginError.NO_SUCH_USER);
                         else {
-                            hideLoginView();
+                            hideLoginWindow();
                             MainView.open(user);
                         }
                         break;
@@ -68,7 +139,7 @@ public class LoginView {
                             showError(LoginError.USERNAME_TAKEN);
                         else {
                             db.addUser(new User(username, password));
-                            JOptionPane.showConfirmDialog(frame,
+                            JOptionPane.showConfirmDialog(this,
                                     "Registration successful!",
                                     "Registration completed",
                                     JOptionPane.CLOSED_OPTION,
@@ -105,9 +176,9 @@ public class LoginView {
                 strError = "Couldn't connect to database";
                 break;
         }
-        JOptionPane.showConfirmDialog(frame,
+        JOptionPane.showConfirmDialog(this,
                 strError,
-                "Login Failed",
+                "LoginView Failed",
                 JOptionPane.CLOSED_OPTION,
                 JOptionPane.ERROR_MESSAGE);
     }
@@ -129,38 +200,6 @@ public class LoginView {
             return false;
         else
             return true;
-    }
-
-    /**
-     * Hides login window
-     */
-    public static void hideLoginView() {
-        frame.setVisible(false);
-    }
-
-    /**
-     * Shows login window
-     */
-    public static void showLoginView() {
-        frame.setVisible(true);
-    }
-
-    /**
-     * Initializes components and listeners
-     *
-     * @param args dummy
-     */
-    public static void main(String[] args) {
-        frame = new JFrame("Login");
-        loginView = getLoginView();
-
-        frame.setContentPane(loginView.panel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(250, 130);
-        frame.setMinimumSize(new Dimension(250, 130));
-        frame.setMaximumSize(new Dimension(350, 150));
-        frame.setLocationRelativeTo(null);
-        showLoginView();
     }
 
     private enum LoginError {

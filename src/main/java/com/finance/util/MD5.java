@@ -42,6 +42,6 @@ public class MD5 {
      * false otherwise
      */
     static public boolean isEquals(String hashedStr, String str) {
-        return hashedStr.equals(getHash(str));
+        return getHash(str).equals(hashedStr);
     }
 }

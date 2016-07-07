@@ -4,13 +4,14 @@ import com.finance.util.MD5;
 import com.finance.util.RecordType;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Account implements Serializable {
 
-    private User owner;
-    private String description;
+    private final User owner;
+    private final String description;
     private float balance;
     private final Set<Record> records;
     private int hash;
@@ -33,19 +34,17 @@ public class Account implements Serializable {
      * Adds <tt>record</tt> to Set of records,
      * changing the balance with record.amount
      * depending on transaction type
-     * (withdraw subtract money, deposit adds money)
+     * (withdraw subtracts money, deposit adds money)
      *
      * @param record record to add
      */
     public void addRecord(Record record) {
-        synchronized (records) {
-            if (records.add(record)) {
-                // if record has been added, then changing balance
-                if (record.getType() == RecordType.WITHDRAW)
-                    balance -= record.getAmount();
-                else if (record.getType() == RecordType.DEPOSIT)
-                    balance += record.getAmount();
-            }
+        if (records.add(record)) {
+            // if record has been added, then changing balance
+            if (record.getType() == RecordType.WITHDRAW)
+                balance -= record.getAmount();
+            else if (record.getType() == RecordType.DEPOSIT)
+                balance += record.getAmount();
         }
     }
 
@@ -53,7 +52,7 @@ public class Account implements Serializable {
      * Deletes <tt>record</tt> from Set of records
      * changing the balance with record.amount
      * depending on transaction type:
-     * (withdraw adds money, deposit subtract money)
+     * (withdraw adds money, deposit subtracts money)
      *
      * @param record record to delete
      * @return deleted <tt>record</tt> (or null if not found)
@@ -61,20 +60,18 @@ public class Account implements Serializable {
     public Record removeRecord(Record record) {
         Record toRet = null;
 
-        synchronized (records) {
-            if (records.contains(record)) {
-                for (Record rec : records) {
-                    if (rec.equals(record)) {
-                        toRet = rec;
+        if (records.contains(record)) {
+            for (Record rec : records) {
+                if (rec.equals(record)) {
+                    toRet = rec;
 
-                        if (rec.getType() == RecordType.WITHDRAW)
-                            balance += rec.getAmount();
-                        else if (rec.getType() == RecordType.DEPOSIT)
-                            balance -= rec.getAmount();
+                    if (rec.getType() == RecordType.WITHDRAW)
+                        balance += rec.getAmount();
+                    else if (rec.getType() == RecordType.DEPOSIT)
+                        balance -= rec.getAmount();
 
-                        records.remove(rec);
-                        break;
-                    }
+                    records.remove(rec);
+                    break;
                 }
             }
         }
@@ -114,7 +111,7 @@ public class Account implements Serializable {
         to prevent sort of violations,
         like adding something to the returned value
         */
-        return new LinkedHashSet<>(records);
+        return Collections.unmodifiableSet(records);
     }
 
     /**

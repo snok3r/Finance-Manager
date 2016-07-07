@@ -12,7 +12,7 @@ public class AccountAdd extends JDialog {
     private JTextField textFieldDescription;
 
     private String description;
-    
+
     public static AccountAdd getDialog() {
         return new AccountAdd();
     }

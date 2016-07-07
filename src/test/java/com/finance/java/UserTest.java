@@ -22,63 +22,6 @@ public class UserTest {
     }
 
     @Test
-    public void changePassword() throws Exception {
-        final String fail = "FAIL\n";
-        final String ok = "OK\n";
-        String res = "";
-
-        System.out.println("Trying change password with:");
-        // trying change password with wrong old password
-        try {
-            user.changePassword("kosya", "fa-da*f2");
-            res = fail;
-            fail();
-        } catch (IllegalArgumentException e) {
-            res = ok;
-        }
-        System.out.printf("wrong old password: %s", res);
-
-        // trying change password with wrong new password length (<= 5)
-        try {
-            user.changePassword("kostya", "f");
-            res = fail;
-            fail();
-        } catch (IllegalArgumentException e) {
-            res = ok;
-        }
-        System.out.printf("wrong new password length (<= 5): %s", res);
-
-        // trying change password with wrong new password length (> 15)
-        try {
-            user.changePassword("kostya", "fa-da*f2dasdhg2j3gjhgsfjhsa");
-            res = fail;
-            fail();
-        } catch (IllegalArgumentException e) {
-            res = ok;
-        }
-        System.out.printf("wrong new password length (> 15): %s", res);
-
-        // trying change password with valid old and new passwords
-        try {
-            user.changePassword("kostya", "e12D&Ay");
-            res = ok;
-        } catch (IllegalArgumentException e) {
-            res = fail;
-            fail();
-        }
-        System.out.printf("valid old and valid new passwords: %s", res);
-    }
-
-    @Test
-    public void checkPassword() throws Exception {
-        assertTrue(user.checkMD5Password("kostya"));
-
-        assertFalse(user.checkMD5Password("kostyA")); // wrong
-        assertFalse(user.checkMD5Password("kos")); // less than 5
-        assertFalse(user.checkMD5Password("kostyakostyakostyakostya")); // longer than 15
-    }
-
-    @Test
     public void addAccount() throws Exception {
         assertEquals(user.getNumOfAccounts(), 0);
         assertEquals(user.getUserBalance(), 0, delta);

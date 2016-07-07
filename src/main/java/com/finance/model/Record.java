@@ -12,8 +12,8 @@ public class Record implements Serializable {
 
     private final long date;
     private float amount;
-    private RecordType type;
-    private Category category;
+    private final RecordType type;
+    private final Category category;
     private final String description;
 
     private final static SimpleDateFormat simpleDate

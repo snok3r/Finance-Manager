@@ -174,7 +174,7 @@ public class DBHelper implements DataStore {
                     if (rs.next()) { // if user found, otherwise rs is empty
                         userId = rs.getInt(1);
                         userPass = rs.getString(2);
-                        if (!user.checkStringPassword(userPass)) // checking passwords
+                        if (!user.checkPassword(userPass)) // checking passwords
                             return -1;
                     } else
                         return -1;

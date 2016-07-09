@@ -3,6 +3,7 @@ package com.finance.model;
 import com.finance.util.MD5;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class User implements Serializable {
      */
     public User(String login, String password) {
         this.login = login;
-        this.password = setPassword(password);
+        this.password = MD5.getHash(password);
         this.accounts = new HashSet<>();
     }
 
@@ -40,26 +41,12 @@ public class User implements Serializable {
     }
 
     /**
-     * Private method to generate hashed password, accepts passwords greater or equal than 5 and less than 15 character long
-     *
-     * @param password password to set
-     * @return hashed <tt>password</tt>
-     * @throws IllegalArgumentException if password is less than 5 or greater or equal than 15 character long
-     */
-    private String setPassword(String password) {
-        if (password.length() >= 5 && password.length() < 15)
-            return MD5.getHash(password);
-        else
-            throw new IllegalArgumentException("password must be at least 5 character long (and less than 15 characters)");
-    }
-
-    /**
      * Method to check whether given password is THE password
      *
      * @param password password to check
      * @return true if <tt>password</tt> matches THE password, false otherwise
      */
-    public boolean checkStringPassword(String password) {
+    public boolean checkPassword(String password) {
         return this.password.equals(password);
     }
 
@@ -79,17 +66,13 @@ public class User implements Serializable {
      * @return deleted <tt>account</tt> (or null if not found)
      */
     public Account removeAccount(Account account) {
-        Account toRet = null;
+        Account toRet = accounts
+                .parallelStream()
+                .filter(a -> a.equals(account))
+                .findFirst()
+                .orElse(null);
 
-        if (accounts.contains(account)) {
-            for (Account acc : accounts) {
-                if (acc.equals(account)) {
-                    toRet = acc;
-                    accounts.remove(acc);
-                    break;
-                }
-            }
-        }
+        accounts.remove(toRet);
 
         return toRet;
     }
@@ -115,7 +98,7 @@ public class User implements Serializable {
      * @return accounts of this user
      */
     public Set<Account> getAccounts() {
-        return accounts;
+        return Collections.unmodifiableSet(accounts);
     }
 
     /**

@@ -32,7 +32,7 @@ public class Account implements Serializable {
 
     /**
      * Adds <tt>record</tt> to Set of records,
-     * changing the balance with record.amount
+     * changing the balance with amount
      * depending on transaction type
      * (withdraw subtracts money, deposit adds money)
      *
@@ -40,7 +40,7 @@ public class Account implements Serializable {
      */
     public void addRecord(Record record) {
         if (records.add(record)) {
-            // if record has been added, then changing balance
+
             if (record.getType() == RecordType.WITHDRAW)
                 balance -= record.getAmount();
             else if (record.getType() == RecordType.DEPOSIT)
@@ -50,7 +50,7 @@ public class Account implements Serializable {
 
     /**
      * Deletes <tt>record</tt> from Set of records
-     * changing the balance with record.amount
+     * changing the balance with amount
      * depending on transaction type:
      * (withdraw adds money, deposit subtracts money)
      *
@@ -58,25 +58,16 @@ public class Account implements Serializable {
      * @return deleted <tt>record</tt> (or null if not found)
      */
     public Record removeRecord(Record record) {
-        Record toRet = null;
+        if (records.remove(record)) {
+            if (record.getType() == RecordType.WITHDRAW)
+                balance += record.getAmount();
+            else if (record.getType() == RecordType.DEPOSIT)
+                balance -= record.getAmount();
 
-        if (records.contains(record)) {
-            for (Record rec : records) {
-                if (rec.equals(record)) {
-                    toRet = rec;
-
-                    if (rec.getType() == RecordType.WITHDRAW)
-                        balance += rec.getAmount();
-                    else if (rec.getType() == RecordType.DEPOSIT)
-                        balance -= rec.getAmount();
-
-                    records.remove(rec);
-                    break;
-                }
-            }
+            return record;
         }
 
-        return toRet;
+        return null;
     }
 
     /**
@@ -106,11 +97,6 @@ public class Account implements Serializable {
      * @return Set of account's records
      */
     public Set<Record> getRecords() {
-        /*
-        returns newly allocated Set
-        to prevent sort of violations,
-        like adding something to the returned value
-        */
         return Collections.unmodifiableSet(records);
     }
 

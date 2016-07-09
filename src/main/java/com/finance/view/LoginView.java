@@ -48,6 +48,7 @@ public class LoginView extends JFrame {
      */
     public void hideLoginWindow() {
         setVisible(false);
+        textFieldPassword.setText("");
     }
 
     /**

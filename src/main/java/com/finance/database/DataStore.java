@@ -4,9 +4,15 @@ import com.finance.model.Account;
 import com.finance.model.Record;
 import com.finance.model.User;
 
+import java.sql.SQLException;
 import java.util.Set;
 
 public interface DataStore {
+
+    void connect() throws SQLException;
+
+    void close();
+
     // return null if no such user
     User acquireUser(String username, String password);
 

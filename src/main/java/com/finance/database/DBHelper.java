@@ -98,6 +98,7 @@ public class DBHelper implements DataStore {
      *
      * @throws SQLException if couldn't connect to database
      */
+    @Override
     public void connect() throws SQLException {
         if (isConnectionOpened())
             return;
@@ -114,6 +115,7 @@ public class DBHelper implements DataStore {
      * Closes Connection.
      * Returns if connection is closed.
      */
+    @Override
     public void close() {
         if (isConnectionClosed())
             return;

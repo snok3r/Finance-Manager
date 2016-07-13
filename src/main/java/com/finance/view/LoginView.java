@@ -1,6 +1,7 @@
 package com.finance.view;
 
 import com.finance.database.DBHelper;
+import com.finance.database.DataStore;
 import com.finance.model.User;
 
 import javax.swing.*;
@@ -14,7 +15,7 @@ public class LoginView extends JFrame {
     private JPasswordField textFieldPassword;
 
     private static LoginView loginView;
-    private static DBHelper db = DBHelper.getInstance();
+    private static DataStore db = DBHelper.getInstance();
 
     private LoginView() throws HeadlessException {
         super("Welcome to Finance Manager!");
